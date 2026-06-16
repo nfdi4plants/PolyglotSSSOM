@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Domain\EntityReference.fs" />
+    <Compile Include="Domain\ExtensionDefinition.fs" />
+    <Compile Include="Domain\Mapping.fs" />
+    <Compile Include="Domain\MappingSet.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fable.Core" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
