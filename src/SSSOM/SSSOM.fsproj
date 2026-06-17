@@ -6,14 +6,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain\CurieMap.fs" />
     <Compile Include="Domain\EntityReference.fs" />
     <Compile Include="Domain\ExtensionDefinition.fs" />
     <Compile Include="Domain\Mapping.fs" />
     <Compile Include="Domain\MappingSet.fs" />
+    <Compile Include="Parser\DecodeMapping.fs" />
+    <Compile Include="Parser\DecodeMappingSet.fs" />
+    <Compile Include="Parser\EncodeMapping.fs" />
+    <Compile Include="Parser\EncodeMappingSet.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Fable.Core" Version="5.0.0" />
+    <PackageReference Include="YAMLicious" Version="0.0.1-alpha" />
   </ItemGroup>
 
 </Project>

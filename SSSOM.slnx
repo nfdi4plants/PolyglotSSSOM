@@ -8,4 +8,7 @@
   <Folder Name="/src/">
     <Project Path="src/SSSOM/SSSOM.fsproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SSSOM.Tests/SSSOM.Tests.fsproj" />
+  </Folder>
 </Solution>
