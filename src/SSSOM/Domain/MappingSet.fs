@@ -4,8 +4,8 @@ open Fable.Core
 
 [<AttachMembers>]
 type MappingSet(
-    Sssom_version: string,
-    ?Curie_map: CurieMap,
+    ?Sssom_version: string,
+    ?Curie_map: array<CurieMap>,
     ?Mappings: string,
     ?Mapping_set_id: string,
     ?Mapping_set_version: string,

@@ -11,10 +11,13 @@
     <Compile Include="Domain\ExtensionDefinition.fs" />
     <Compile Include="Domain\Mapping.fs" />
     <Compile Include="Domain\MappingSet.fs" />
+    <Compile Include="Domain\SssomDocument.fs" />
     <Compile Include="Parser\DecodeMapping.fs" />
     <Compile Include="Parser\DecodeMappingSet.fs" />
     <Compile Include="Parser\EncodeMapping.fs" />
     <Compile Include="Parser\EncodeMappingSet.fs" />
+    <Compile Include="Parser\DecodeSssomDocument.fs" />
+    <Compile Include="Parser\EncodeSssomDocument.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -41,8 +41,8 @@ type Mapping(
     ?Review_date: string,
     ?Confidence: double,
     ?Reviewer_agreement: double,
-    ?Curation_role: string,
-    ?Curation_role_text: string,
+    ?Curation_rule: string,
+    ?Curation_rule_text: string,
     ?Subject_match_field: string,
     ?Object_match_field: string,
     ?Match_string: string,
@@ -93,8 +93,8 @@ type Mapping(
     let mutable _review_date = Review_date
     let mutable _confidence = Confidence
     let mutable _reviewer_agreement = Reviewer_agreement
-    let mutable _curation_rule = Curation_role
-    let mutable _curation_rule_text = Curation_role_text
+    let mutable _curation_rule = Curation_rule
+    let mutable _curation_rule_text = Curation_rule_text
     let mutable _subject_match_field = Subject_match_field
     let mutable _object_match_field = Object_match_field
     let mutable _match_string = Match_string

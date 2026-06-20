@@ -29,7 +29,7 @@ let ``extractMapping should ignore comments with slashes or whitespaces`` () =
 let ``extractMapping should process empty string correctly`` () =
     let result = DecodeMapping.extractMapping("")
 
-    Assert.Equal("", result.Trim())
+    Assert.Equal("", result)
 
 
 // ==========================================
@@ -79,10 +79,10 @@ let ``TSV with inconsistent column counts should return false`` () =
 // ParseTsvtoMappings
 // ==========================================
 [<Fact>]
-let ``ParseTsvtoMappings should parse valid TSV in mapping Object`` () =
+let ``DecodeMapping should parse valid TSV in mapping Object`` () =
     let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tManual\t0.95"
 
-    let result = DecodeMapping.ParseTsvtoMappings(tsv)
+    let result = DecodeMapping.DecodeMapping(tsv)
 
     let mapping = result.[0]
     Assert.Equal("KF:01", mapping.Predicate_id)
@@ -90,4 +90,29 @@ let ``ParseTsvtoMappings should parse valid TSV in mapping Object`` () =
     Assert.Equal(Some 0.95, mapping.Confidence)
     Assert.Equal(None, mapping.Subject_id)
 
+[<Fact>]
+let ``DecodeMapping should throw exception if tsv is invalid`` () =
+    let invalidTsv = "subject_id\tconfidence\nKF:01\t0.95"
 
+    let ex = Assert.Throws<Exception>(fun () ->
+        DecodeMapping.DecodeMapping(invalidTsv) |> ignore
+    )
+
+    Assert.Contains("Invalid TSV Input", ex.Message)
+
+
+[<Fact>]
+let ``DecodeMapping should return None for empty double-cells`` () =
+    let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tManual\t"
+
+    let result = DecodeMapping.DecodeMapping(tsv)
+
+    Assert.Equal(None, result.[0].Confidence)
+
+[<Fact>]
+let ``DecodeMapping should return None for empty cells`` () =
+    let tsv = "predicate_id\tmapping_justification\tconfidence\tRecord_id\nKF:01\tManual\t\tINSDC:000001"
+
+    let result = DecodeMapping.DecodeMapping(tsv)
+
+    Assert.Equal(None, result.[0].Confidence)

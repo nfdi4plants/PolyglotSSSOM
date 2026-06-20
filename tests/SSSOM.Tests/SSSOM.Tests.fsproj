@@ -7,6 +7,11 @@
 
   <ItemGroup>
     <Compile Include="DecodeMappingTest.fs" />
+    <Compile Include="DecodeMappingSetTest.fs" />
+    <Compile Include="EncodeMappingTest.fs" />
+    <Compile Include="EncodeMappingSetTest.fs" />
+    <Compile Include="EncodeSssomDocumentTest.fs" />
+    <Compile Include="DecodeSssomDocumentTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -55,7 +55,7 @@ type DecodeMapping() =
                 isValid <- false
             isValid
 
-    static member ParseTsvtoMappings (source: string) =
+    static member DecodeMapping (source: string) =
         let tsvString = DecodeMapping.extractMapping(source)
 
         if not (DecodeMapping.isValidTsvInput(tsvString)) then
@@ -140,8 +140,8 @@ type DecodeMapping() =
                     ?Review_date = getOptionalString "review_date",
                     ?Confidence = getOptionalDouble "confidence",
                     ?Reviewer_agreement = getOptionalDouble "reviewer_agreement",
-                    ?Curation_role = getOptionalString "curation_role",
-                    ?Curation_role_text = getOptionalString "curation_role_text",
+                    ?Curation_rule = getOptionalString "curation_rule",
+                    ?Curation_rule_text = getOptionalString "curation_rule_text",
                     ?Subject_match_field = getOptionalString "subject_match_field",
                     ?Object_match_field = getOptionalString "object_match_field",
                     ?Match_string = getOptionalString "match_string",
