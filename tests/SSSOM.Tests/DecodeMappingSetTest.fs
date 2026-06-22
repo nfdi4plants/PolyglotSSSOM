@@ -54,7 +54,7 @@ let ``isValidYamlInput should return false for invalid input`` () =
 [<Fact>]
 let ``DecodeMappingSet should create a valid mappingSet-object for valid Input`` () =
     let fullInput =
-        "# sssom_version: 1.0.0\n" +
+        "# sssom_version: sssom:version1.0\n" +
         "# mapping_set_id: http://example.org\n" +
         "# curie_map:\n" +
         "#   HP: http://purl.obolibrary.org/obo/HP_\n" +
@@ -62,12 +62,13 @@ let ``DecodeMappingSet should create a valid mappingSet-object for valid Input``
 
     let result = DecodeMappingSet.DecodeMappingSet(fullInput)
 
-    Assert.Equal("1.0.0", result.Sssom_version.Value)
-    Assert.Equal("http://example.org", result.Mapping_set_id.Value)
+    Assert.Equal(Some SssomVersion.V1_0, result.Sssom_version)
+
+    Assert.True(result.Mapping_set_id.IsSome)
+
+    Assert.Equal("http://example.org", result.Mapping_set_id.Value.Value)
 
     Assert.True(result.Curie_map.IsSome)
-    // let curies = result.Curie_map.Value
-    // Assert.Single(curies)
 
 [<Fact>]
 let ``DecodeMappingSet should throw exception if input is invalid`` () =

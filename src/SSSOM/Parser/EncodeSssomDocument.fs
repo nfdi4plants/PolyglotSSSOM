@@ -1,5 +1,8 @@
 namespace SSSOM
 
+open Fable.Core
+
+[<AttachMembers>]
 type EncodeSssomDocument() =
     static member EncodeSssomDocument(doc: SssomDocument) =
         let mappingSet = EncodeMappingSet.EncodeMappingSet(doc.Metadata)

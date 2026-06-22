@@ -6,12 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain\NonRelativeUri.fs" />
+    <Compile Include="Domain\SssomVersion.fs" />
     <Compile Include="Domain\CurieMap.fs" />
     <Compile Include="Domain\EntityReference.fs" />
     <Compile Include="Domain\ExtensionDefinition.fs" />
     <Compile Include="Domain\Mapping.fs" />
     <Compile Include="Domain\MappingSet.fs" />
     <Compile Include="Domain\SssomDocument.fs" />
+    <Compile Include="Parser\DecodeExtensionDefinition.fs" />
+    <Compile Include="Parser\DecodeSssomVersion.fs" />
+    <Compile Include="Parser\DecodeCurieMap.fs" />
     <Compile Include="Parser\DecodeMapping.fs" />
     <Compile Include="Parser\DecodeMappingSet.fs" />
     <Compile Include="Parser\EncodeMapping.fs" />

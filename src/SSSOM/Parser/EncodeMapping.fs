@@ -2,7 +2,9 @@ namespace SSSOM
 
 open System
 open System.Text
+open Fable.Core
 
+[<AttachMembers>]
 type EncodeMapping() = 
 
 
@@ -149,7 +151,7 @@ type EncodeMapping() =
             let rowVals = getRowValues item
             let activeValues = ResizeArray<string>()
 
-            for colIdx in 0..numCols-1 do
+            for colIdx in 0..numCols - 1 do
                 if columnHasData.[colIdx] then
                     activeValues.Add(rowVals.[colIdx])
 

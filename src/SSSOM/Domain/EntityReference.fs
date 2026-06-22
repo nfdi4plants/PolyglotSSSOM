@@ -1,27 +1,22 @@
 ﻿namespace SSSOM
 
 open Fable.Core
+open System.Text.RegularExpressions
 
 [<AttachMembers>]
-type EntityReference(TypeOf: string, Base: string, TypeURI: string, Representation: string) =
-    let mutable _typeOf = TypeOf
-    let mutable ``_base`` = Base
-    let mutable _typeURI = TypeURI
-    let mutable _representation = Representation
+type EntityReference private (value: string) =
+    member this.Value
+        with get() = value
 
-    member this.TypeOf
-        with get() = _typeOf
-        and set value = _typeOf <- value
+    static member TypeClassUri = "rdfs:Resource"
+    static member TypeClassCurie = "rdfs:Resource"
+    static member TypeName = "EntityReference"
+    static member TypeModelUri = "SSSOM.EntityReference"
 
-    member this.Base
-        with get() = ``_base``
-        and set value = ``_base`` <- value
-
-    member this.TypeURI
-        with get() = _typeURI
-        and set value = _typeURI <- value
-
-    member this.Representation
-        with get() = _representation
-        and set value = _representation <- value
+    static member Create(text: string) =
+        let isValid = Regex.IsMatch(text, @"^[a-zA-Z0-9_.-]+:")
+        if isValid then
+            EntityReference(text)
+        else
+           failwith $"Can't create EntityReference from '{text}'. It must be a valid URI or CURIE (e.g., 'prefix:value')." 
 

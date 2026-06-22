@@ -15,9 +15,9 @@ let ``EncodeMappingSet should return a valid yaml output for valid mappingSet ob
                         CurieMap("KF_FOOD", "https://kewl-foodie.inc/food/")
                         CurieMap("orcid", "https://orcid.org/")
                     |],
-                Mapping_set_id = "https://w3id.org/sssom/tutorial/example1.sssom.tsv",
+                Mapping_set_id = NonRelativeURI.Create "https://w3id.org/sssom/tutorial/example1.sssom.tsv",
                 Mapping_set_description = "Manually curated alignment of KEWL FOODIE INC internal food and nutrition database with Food Ontology (FOODON). Intended to be used for ontological analysis and grouping of KEWL FOODIE INC related data.",
-                License = "https://creativecommons.org/licenses/by/4.0/",
+                License = NonRelativeURI.Create "https://creativecommons.org/licenses/by/4.0/",
                 Mapping_date = "2022-05-02"
             )
         )

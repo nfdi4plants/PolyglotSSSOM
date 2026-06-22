@@ -1,5 +1,8 @@
 namespace SSSOM
 
+open Fable.Core
+
+[<AttachMembers>]
 type DecodeSssomDocument() =
     static member DecodeSssomDocument(document: string) =
         SssomDocument(
