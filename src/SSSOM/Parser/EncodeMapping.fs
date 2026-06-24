@@ -67,69 +67,106 @@ type EncodeMapping() =
 
         let numCols = allHeaders.Length
 
-        let getValue opt = 
+        let processString (s: string) = 
+            s.Replace("\t", " ").Replace("\n", " ").Replace("\r", " ")
+
+        let getOptionalString opt = 
             match opt with
-            | Some (value: string) -> value.Replace("\t", " ").Replace("\n", " ").Replace("\r", " ")
+            | Some (value: string) -> processString value
             | _ -> ""
 
-        let getFloatValue opt =
+        let getOptionalFloat opt =
             match opt with
             | Some (v: double) -> v.ToString(System.Globalization.CultureInfo.InvariantCulture)
             | _ -> ""
 
+        let getEntityReference (opt: EntityReference) =
+            processString opt.Value
+ 
+
+        let getOptionalEntityReference (opt: option<EntityReference>) =
+            match opt with
+            | Some ref -> processString ref.Value
+            | None -> ""
+
+        let getOptionalPredicateModifierEnum (opt: option<PredicateModifierEnum>) =
+            match opt with
+            | Some enum -> PredicateModifierEnum.toString enum
+            | None -> ""
+
+        let getOptionalNonRelativeURI (opt: option<NonRelativeURI>) =
+            match opt with
+            | Some uri -> processString uri.Value
+            | None -> ""
+
+        let getOptionalEntityTypeEnum (opt: option<EntityTypeEnum>) =
+            match opt with
+            | Some enum -> EntityTypeEnum.toString enum
+            | None -> ""
+
+        let getOptionalMappingCardinalityEnum (opt: option<MappingCardinalityEnum>) =
+            match opt with
+            | Some enum -> MappingCardinalityEnum.toString enum
+            | None -> ""
+
+        let getOptionalDate (opt: option<Date>) =
+            match opt with
+            | Some date -> date.Value
+            | None -> ""
+
         let getRowValues (i: Mapping) = 
             [|
-                i.Predicate_id.Replace("\t", " ").Replace("\n", " ").Replace("\r", " ")
-                i.Mapping_justification.Replace("\t", " ").Replace("\n", " ").Replace("\r", " ")
-                getValue i.Record_id
-                getValue i.Subject_id
-                getValue i.Subject_label
-                getValue i.Subject_category
-                getValue i.Predicate_label
-                getValue i.Predicate_modifier
-                getValue i.Object_id
-                getValue i.Object_label
-                getValue i.Object_category
-                getValue i.author_id
-                getValue i.Author_label
-                getValue i.Reviewer_id
-                getValue i.Reviewer_label
-                getValue i.Creator_id
-                getValue i.Creator_label
-                getValue i.License
-                getValue i.Subject_type
-                getValue i.Subject_source
-                getValue i.Subject_source_version
-                getValue i.Object_type
-                getValue i.Object_source
-                getValue i.Object_source_version
-                getValue i.Predicate_type
-                getValue i.Mapping_provider
-                getValue i.Mapping_source
-                getValue i.Mapping_cardinality
-                getValue i.Cardinality_scope
-                getValue i.Mapping_tool
-                getValue i.Mapping_tool_id
-                getValue i.Mapping_tool_version
-                getValue i.Mapping_date
-                getValue i.Publication_date
-                getValue i.Review_date
-                getFloatValue i.Confidence
-                getFloatValue i.Reviewer_agreement
-                getValue i.Curation_rule
-                getValue i.Curation_rule_text
-                getValue i.Subject_match_field
-                getValue i.Object_match_field
-                getValue i.Match_string
-                getValue i.Subject_preprocessing
-                getValue i.Object_preprocessing
-                getFloatValue i.Similarity_score
-                getValue i.Similarity_measure
-                getValue i.See_also
-                getValue i.Issue_tracker_item
-                getValue i.Derived_from
-                getValue i.Other
-                getValue i.Comment
+                getEntityReference i.Predicate_id
+                getEntityReference i.Mapping_justification
+                getOptionalEntityReference i.Record_id
+                getOptionalEntityReference i.Subject_id
+                getOptionalString i.Subject_label
+                getOptionalString i.Subject_category
+                getOptionalString i.Predicate_label
+                getOptionalPredicateModifierEnum i.Predicate_modifier
+                getOptionalEntityReference i.Object_id
+                getOptionalString i.Object_label
+                getOptionalString i.Object_category
+                getOptionalEntityReference i.author_id
+                getOptionalString i.Author_label
+                getOptionalEntityReference i.Reviewer_id
+                getOptionalString i.Reviewer_label
+                getOptionalEntityReference i.Creator_id
+                getOptionalString i.Creator_label
+                getOptionalNonRelativeURI i.License
+                getOptionalEntityTypeEnum i.Subject_type
+                getOptionalEntityReference i.Subject_source
+                getOptionalString i.Subject_source_version
+                getOptionalEntityTypeEnum i.Object_type
+                getOptionalEntityTypeEnum i.Object_source
+                getOptionalString i.Object_source_version
+                getOptionalEntityTypeEnum i.Predicate_type
+                getOptionalNonRelativeURI i.Mapping_provider
+                getOptionalEntityReference i.Mapping_source
+                getOptionalMappingCardinalityEnum i.Mapping_cardinality
+                getOptionalString i.Cardinality_scope
+                getOptionalString i.Mapping_tool
+                getOptionalEntityReference i.Mapping_tool_id
+                getOptionalString i.Mapping_tool_version
+                getOptionalDate i.Mapping_date
+                getOptionalDate i.Publication_date
+                getOptionalDate i.Review_date
+                getOptionalFloat i.Confidence
+                getOptionalFloat i.Reviewer_agreement
+                getOptionalEntityReference i.Curation_rule
+                getOptionalString i.Curation_rule_text
+                getOptionalEntityReference i.Subject_match_field
+                getOptionalEntityReference i.Object_match_field
+                getOptionalString i.Match_string
+                getOptionalEntityReference i.Subject_preprocessing
+                getOptionalEntityReference i.Object_preprocessing
+                getOptionalFloat i.Similarity_score
+                getOptionalString i.Similarity_measure
+                getOptionalNonRelativeURI i.See_also
+                getOptionalEntityReference i.Issue_tracker_item
+                getOptionalEntityReference i.Derived_from
+                getOptionalString i.Other
+                getOptionalString i.Comment
             |]
 
         let columnHasData = Array.create numCols false

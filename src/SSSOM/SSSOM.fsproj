@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain\MappingCardinalityEnum.fs" />
+    <Compile Include="Domain\PredicateModifierEnum.fs" />
+    <Compile Include="Domain\Date.fs" />
+    <Compile Include="Domain\EntityTypeEnum.fs" />
     <Compile Include="Domain\NonRelativeUri.fs" />
     <Compile Include="Domain\SssomVersion.fs" />
     <Compile Include="Domain\CurieMap.fs" />

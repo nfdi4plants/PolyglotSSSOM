@@ -13,10 +13,21 @@ type EntityReference private (value: string) =
     static member TypeName = "EntityReference"
     static member TypeModelUri = "SSSOM.EntityReference"
 
-    static member Create(text: string) =
-        let isValid = Regex.IsMatch(text, @"^[a-zA-Z0-9_.-]+:")
-        if isValid then
+    member this.IsSome =
+        match Some this with
+        | Some _ -> true
+        | None -> false
+
+    member this.IsNone =
+        match Some this with
+        | None -> true
+        | Some _ -> false
+
+    static member create(text: string) =
+        let isUriOrCurie = Regex.IsMatch(text, @"^[a-zA-Z0-9_.-]+:\S+$")
+        if isUriOrCurie then
             EntityReference(text)
         else
            failwith $"Can't create EntityReference from '{text}'. It must be a valid URI or CURIE (e.g., 'prefix:value')." 
+
 

@@ -6,7 +6,6 @@ open Fable.Core
 type MappingSet(
     ?Sssom_version: SssomVersion,
     ?Curie_map: array<CurieMap>,
-    ?Mappings: string,
     ?Mapping_set_id: NonRelativeURI,
     ?Mapping_set_version: string,
     ?Mapping_set_source: NonRelativeURI,
@@ -16,20 +15,20 @@ type MappingSet(
     ?Creator_id: EntityReference,
     ?Creator_label: string,
     ?License: NonRelativeURI,
-    ?Subject_type: string,
+    ?Subject_type: EntityTypeEnum,
     ?Subject_source: EntityReference,
     ?Subject_source_version: string,
-    ?Object_type: string,
+    ?Object_type: EntityTypeEnum,
     ?Object_source: EntityReference,
     ?Object_source_version: string,
-    ?Predicate_type: string,
+    ?Predicate_type: EntityTypeEnum,
     ?Mapping_provider: NonRelativeURI,
     ?Cardinality_scope: string,
     ?Mapping_tool: string,
     ?Mapping_tool_id: EntityReference,
     ?Mapping_tool_version: string,
-    ?Mapping_date: string,
-    ?Publication_date: string,
+    ?Mapping_date: Date,
+    ?Publication_date: Date,
     ?Subject_match_field: EntityReference,
     ?Object_match_field: EntityReference,
     ?Subject_preprocessing: EntityReference,
@@ -45,7 +44,6 @@ type MappingSet(
 ) =
     let mutable _sssom_version = Sssom_version
     let mutable _curie_map = Curie_map
-    let mutable _mappings = Mappings
     let mutable _mapping_set_id = Mapping_set_id
     let mutable _mapping_set_version = Mapping_set_version
     let mutable _mapping_set_source = Mapping_set_source
@@ -89,10 +87,6 @@ type MappingSet(
     member this.Curie_map
         with get() = _curie_map
         and set value = _curie_map <- value
-
-    member this.Mappings
-        with get() = _mappings
-        and set value = _mappings <- value
 
     member this.Mapping_set_id
         with get() = _mapping_set_id

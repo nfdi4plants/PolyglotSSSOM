@@ -5,7 +5,7 @@ open Fable.Core
 
 [<AttachMembers>]
 type DecodeSssomVersion() =
-    static member DecodeSssomVersion =
+    static member Decode =
         Decode.object (fun get ->
             let rawVersion = get.Optional.Field "sssom_version" Decode.string
 

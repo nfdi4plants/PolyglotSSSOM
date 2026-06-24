@@ -98,60 +98,94 @@ type DecodeMapping() =
                 | None -> 
                     None
 
-            let predicateId = getRequiredString "predicate_id"
-            let mappingJustification = getRequiredString "mapping_justification"
+            let getEntityReference (colName: string) =
+                match getRequiredString colName with
+                | entityreference -> EntityReference.create entityreference
+
+            let getOptionalEntityReference (colName: string) =
+                match getOptionalString colName with
+                | Some entityRef -> Some (EntityReference.create entityRef)
+                | None -> None
+
+            let getOptionalPredicateModifierEnum (colName: string) =
+                match getOptionalString colName with
+                | Some enum -> Some (PredicateModifierEnum.create enum)
+                | None -> None
+
+            let getOptionalNonRelativeURI (colName: string) =
+                match getOptionalString colName with
+                | Some uri -> Some (NonRelativeURI.create uri)
+                | None -> None
+
+            let getOptionalEntityTypeEnum (colName: string) =
+                match getOptionalString colName with
+                | Some enum -> Some (EntityTypeEnum.create colName)
+                | None -> None
+
+            let getOptionalMappingCardinalityEnum (colName: string) =
+                match getOptionalString colName with
+                | Some enum -> Some (MappingCardinalityEnum.create enum)
+                | None -> None
+
+            let getOptionalDate (colName: string) =
+                match getOptionalString colName with
+                | Some date -> Some (Date.create date)
+                | None -> None
+
+            let predicateId = getEntityReference "predicate_id"
+            let mappingJustification = getEntityReference "mapping_justification"
 
             let newMapping = 
                 Mapping(
                     predicate_id = predicateId,
                     mapping_justification = mappingJustification,
-                    ?Record_id = getOptionalString "record_id",
-                    ?Subject_id = getOptionalString "subject_id",
+                    ?Record_id = getOptionalEntityReference "record_id",
+                    ?Subject_id = getOptionalEntityReference "subject_id",
                     ?Subject_label = getOptionalString "subject_label",
                     ?Subject_category = getOptionalString "subject_category",
                     ?Predicate_label = getOptionalString "predicate_label",
-                    ?Predicate_modifier = getOptionalString "predicate_modifier",
-                    ?Object_id = getOptionalString "object_id",
+                    ?Predicate_modifier = getOptionalPredicateModifierEnum "predicate_modifier",
+                    ?Object_id = getOptionalEntityReference "object_id",
                     ?Object_label = getOptionalString "object_label",
                     ?Object_category = getOptionalString "object_category",
-                    ?Author_id = getOptionalString "author_id",
+                    ?Author_id = getOptionalEntityReference "author_id",
                     ?Author_label = getOptionalString "author_label",
-                    ?Reviewer_id = getOptionalString "reviewer_id",
+                    ?Reviewer_id = getOptionalEntityReference "reviewer_id",
                     ?Reviewer_label = getOptionalString "reviewer_label",
-                    ?Creator_id = getOptionalString "creator_id",
+                    ?Creator_id = getOptionalEntityReference "creator_id",
                     ?Creator_label = getOptionalString "creator_label",
-                    ?License = getOptionalString "license",
-                    ?Subject_type = getOptionalString "subject_type",
-                    ?Subject_source = getOptionalString "subject_source",
+                    ?License = getOptionalNonRelativeURI "license",
+                    ?Subject_type = getOptionalEntityTypeEnum "subject_type",
+                    ?Subject_source = getOptionalEntityReference "subject_source",
                     ?Subject_source_version = getOptionalString "subject_source_version",
-                    ?Object_type = getOptionalString "object_type",
-                    ?Object_source = getOptionalString "object_source",
+                    ?Object_type = getOptionalEntityTypeEnum "object_type",
+                    ?Object_source = getOptionalEntityReference "object_source",
                     ?Object_source_version = getOptionalString "object_source_version",
-                    ?Predicate_type = getOptionalString "predicate_type",
-                    ?Mapping_provider = getOptionalString "mapping_provider",
-                    ?Mapping_source = getOptionalString "mapping_source",
-                    ?Mapping_cardinality = getOptionalString "mapping_cardinality",
+                    ?Predicate_type = getOptionalEntityTypeEnum "predicate_type",
+                    ?Mapping_provider = getOptionalNonRelativeURI "mapping_provider",
+                    ?Mapping_source = getOptionalEntityReference "mapping_source",
+                    ?Mapping_cardinality = getOptionalMappingCardinalityEnum "mapping_cardinality",
                     ?Cardinality_scope = getOptionalString "cardinality_scope",
                     ?Mapping_tool = getOptionalString "mapping_tool",
-                    ?Mapping_tool_id = getOptionalString "mapping_tool_id",
+                    ?Mapping_tool_id = getOptionalEntityReference "mapping_tool_id",
                     ?Mapping_tool_version = getOptionalString "mapping_tool_version",
-                    ?Mapping_date = getOptionalString "mapping_date",
-                    ?Publication_date = getOptionalString "publication_date",
-                    ?Review_date = getOptionalString "review_date",
+                    ?Mapping_date = getOptionalDate "mapping_date",
+                    ?Publication_date = getOptionalDate "publication_date",
+                    ?Review_date = getOptionalDate "review_date",
                     ?Confidence = getOptionalDouble "confidence",
                     ?Reviewer_agreement = getOptionalDouble "reviewer_agreement",
-                    ?Curation_rule = getOptionalString "curation_rule",
+                    ?Curation_rule = getOptionalEntityReference "curation_rule",
                     ?Curation_rule_text = getOptionalString "curation_rule_text",
-                    ?Subject_match_field = getOptionalString "subject_match_field",
-                    ?Object_match_field = getOptionalString "object_match_field",
+                    ?Subject_match_field = getOptionalEntityReference "subject_match_field",
+                    ?Object_match_field = getOptionalEntityReference "object_match_field",
                     ?Match_string = getOptionalString "match_string",
-                    ?Subject_preprocessing = getOptionalString "subject_preprocessing",
-                    ?Object_preprocessing = getOptionalString "object_preprocessing",
+                    ?Subject_preprocessing = getOptionalEntityReference "subject_preprocessing",
+                    ?Object_preprocessing = getOptionalEntityReference "object_preprocessing",
                     ?Similarity_score = getOptionalDouble "similarity_score",
                     ?Similarity_measure = getOptionalString "similarity_measure",
-                    ?See_also = getOptionalString "see_also",
-                    ?Issue_tracker_item = getOptionalString "issue_tracker_item",
-                    ?Derived_from = getOptionalString "derived_from",
+                    ?See_also = getOptionalNonRelativeURI "see_also",
+                    ?Issue_tracker_item = getOptionalEntityReference "issue_tracker_item",
+                    ?Derived_from = getOptionalEntityReference "derived_from",
                     ?Other = getOptionalString "other",
                     ?Comment = getOptionalString "comment"
                 )

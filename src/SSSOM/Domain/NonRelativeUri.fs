@@ -14,7 +14,7 @@ type NonRelativeURI private (uri: string) =
     static member TypeName = "NonRelativeURI"
     static member TypeModelUri = "SSSOM.NonRelativeURI"
 
-    static member Create (uriText: string) =
+    static member create (uriText: string) =
         let hasScheme = Regex.IsMatch(uriText, @"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 
         if hasScheme then

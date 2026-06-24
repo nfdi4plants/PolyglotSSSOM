@@ -6,12 +6,12 @@ open YAMLicious
 [<AttachMembers>]
 type DecodeExtensionDefinition() =
     
-    static member Decoder =
+    static member Decode =
         Decode.object (fun get -> 
             
             let parseEntityReference reference =
                 match reference with
-                | Some x -> Some (EntityReference.Create x)
+                | Some x -> Some (EntityReference.create x)
                 | None -> None
 
             ExtensionDefinition(
