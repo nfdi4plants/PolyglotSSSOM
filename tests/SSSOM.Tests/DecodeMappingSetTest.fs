@@ -1,83 +1,86 @@
 module SSSOM.Tests.DecodeMappingSetTests
 
-open System
-open Xunit
 open SSSOM
+open Fable.Pyxpecto
 
+let tests = 
+    testList "DecodeMappingSet Tests" [
 
-// ==========================================
-// extractMapping
-// ==========================================
-[<Fact>]
-let ``extractMappingSet should extract rows with #`` () =
-    let input =
-        "# license: CC0\n" +
-        "# sssom_version: 1.0.0\n" + 
-        "subject_id\tobject_id\tpredicate_id\n" +
-        "HP:0001\tDOID:0002\tskos:exactMatch"
+        // ==========================================
+        // extractMappingSet
+        // ==========================================
+        testList "extractMappingSet" [
+            testCase "should extract rows with #" <| fun _ ->
+                let input =
+                    "# license: CC0\n" +
+                    "# sssom_version: 1.0.0\n" + 
+                    "subject_id\tobject_id\tpredicate_id\n" +
+                    "HP:0001\tDOID:0002\tskos:exactMatch"
 
-    let result = DecodeMappingSet.extractMappingSet(input)
+                let result = DecodeMappingSet.extractMappingSet(input)
+                let expected = "# license: CC0\n# sssom_version: 1.0.0"
+                
+                Expect.equal result expected "Metadata rows starting with # should be extracted correctly"
+        ]
 
-    let expected = "# license: CC0\n# sssom_version: 1.0.0"
-    Assert.Equal(expected, result)
+        // ==========================================
+        // isValidYamlInput
+        // ==========================================
+        testList "isValidYamlInput" [
+            testCase "should return true for correct input" <| fun _ ->
+                let validYaml =
+                    "# sssom_version: 1.0.0\n" +
+                    "# curie_map:\n" +
+                    "#   HP: http://purl.obolibrary.org/obo/HP_\n" +
+                    "#   DOID: http://purl.obolibrary.org/obo/DOID_"
 
+                let result = DecodeMappingSet.isValidYamlInput(validYaml)
+                Expect.isTrue result "Should return true for a valid YAML header"
 
-// ==========================================
-// isValidTsvInput
-// ==========================================
-[<Fact>]
-let ``isValidYamlInput should return true for correct input`` () =
-    let validYaml =
-        "# sssom_version: 1.0.0\n" +
-        "# curie_map:\n" +
-        "#   HP: http://purl.obolibrary.org/obo/HP_\n" +
-        "#   DOID: http://purl.obolibrary.org/obo/DOID_"
+            testCase "should return false for invalid input" <| fun _ ->
+                let invalidYaml =
+                    "# sssom_version: 1.0.0\n" +
+                    "#   curie_map:\n" + 
+                    "# HP: http://..."
 
-    let result = DecodeMappingSet.isValidYamlInput(validYaml)
+                let result = DecodeMappingSet.isValidYamlInput(invalidYaml)
+                Expect.isFalse result "Should return false for an improperly formatted YAML header"
+        ]
 
-    Assert.True(result)
+        // ==========================================
+        // DecodeMappingSet
+        // ==========================================
+        testList "DecodeMappingSet" [
+            testCase "should create a valid mappingSet-object for valid input" <| fun _ ->
+                let fullInput =
+                    "# sssom_version: sssom:version1.0\n" +
+                    "# mapping_set_id: http://example.org\n" +
+                    "# curie_map:\n" +
+                    "#   HP: http://purl.obolibrary.org/obo/HP_\n" +
+                    "subject_id\tobject_id"
 
-[<Fact>]
-let ``isValidYamlInput should return false for invalid input`` () =
-    let invalidYaml =
-        "# sssom_version: 1.0.0\n" +
-        "#   curie_map:\n" + 
-        "# HP: http://..."
+                let result = DecodeMappingSet.DecodeMappingSet(fullInput)
 
-    let result = DecodeMappingSet.isValidYamlInput(invalidYaml)
+                Expect.equal result.Sssom_version (Some SssomVersion.V1_0) "Sssom_version should be parsed correctly"
+                
+                Expect.isSome result.Mapping_set_id "Mapping_set_id should not be None"
+                Expect.equal result.Mapping_set_id.Value.Value "http://example.org" "Mapping_set_id value should match the input"
+                
+                Expect.isSome result.Curie_map "Curie_map should not be None"
 
-    Assert.False(result)
+            testCase "should throw exception if input is invalid" <| fun _ ->
+                let badInput =
+                    "#   sssom_version: 1.0.0\n" + 
+                    "# bad_indent\n"
 
-// ==========================================
-// DecodeMappingSet
-// ==========================================
-[<Fact>]
-let ``DecodeMappingSet should create a valid mappingSet-object for valid Input`` () =
-    let fullInput =
-        "# sssom_version: sssom:version1.0\n" +
-        "# mapping_set_id: http://example.org\n" +
-        "# curie_map:\n" +
-        "#   HP: http://purl.obolibrary.org/obo/HP_\n" +
-        "subject_id\tobject_id"
+                let exceptionThrown = 
+                    try 
+                        DecodeMappingSet.DecodeMappingSet(badInput) |> ignore
+                        None
+                    with ex -> 
+                        Some ex
 
-    let result = DecodeMappingSet.DecodeMappingSet(fullInput)
-
-    Assert.Equal(Some SssomVersion.V1_0, result.Sssom_version)
-
-    Assert.True(result.Mapping_set_id.IsSome)
-
-    Assert.Equal("http://example.org", result.Mapping_set_id.Value.Value)
-
-    Assert.True(result.Curie_map.IsSome)
-
-[<Fact>]
-let ``DecodeMappingSet should throw exception if input is invalid`` () =
-    let badInput =
-        "#   sssom_version: 1.0.0\n" + 
-        "# bad_indent\n"
-
-    let ex = Assert.Throws<Exception>(fun () ->
-        DecodeMappingSet.DecodeMappingSet(badInput) |> ignore
-    )
-
-    Assert.Contains("Yaml-input is not valid!", ex.Message)
+                Expect.isSome exceptionThrown "An exception should be thrown for invalid YAML input"
+                Expect.stringContains exceptionThrown.Value.Message "Yaml-input is not valid!" "The exception message should indicate invalid YAML input"
+        ]
+    ]

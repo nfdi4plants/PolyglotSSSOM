@@ -1,123 +1,97 @@
 ﻿module SSSOM.Tests.DecodeMappingTests
 
-open System
-open Xunit
 open SSSOM
+open Fable.Pyxpecto
 
-// ==========================================
-// extractMapping
-// ==========================================
-[<Fact>]
-let ``extractMapping should remove rows with #`` () =
-    let input = "# This is a comment\npredicate_id\tmapping_justification\n# Another comment\nKF:01\tsemapv:ManualMappingCuration"
-    let expected = "predicate_id\tmapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+let tests =
+    testList "DecodeMapping Tests" [
 
-    let result = DecodeMapping.extractMapping(input)
+        // ==========================================
+        // extractMapping
+        // ==========================================
+        testList "extractMapping" [
+            testCase "should remove rows with #" <| fun _ -> 
+                let input = "# This is a comment\npredicate_id\tmapping_justification\n# Another comment\nKF:01\tsemapv:ManualMappingCuration"
+                let expected = "predicate_id\tmapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+                let result = DecodeMapping.extractMapping(input)
+                Expect.equal result expected "should remove rows with #"
 
-    Assert.Equal(expected, result)
+            testCase "should ignore comments with slashes or whitespaces" <| fun _ ->
+                let input = "//   # Curie Map info\npredicate_id\tmapping_justification"
+                let expected = "predicate_id\tmapping_justification"
+                let result = DecodeMapping.extractMapping(input)
+                Expect.equal result expected "should ignore comments with slashes or whitespaces"
 
-[<Fact>]
-let ``extractMapping should ignore comments with slashes or whitespaces`` () =
-    let input = "//   # Curie Map info\npredicate_id\tmapping_justification"
-    let expected = "predicate_id\tmapping_justification"
+            testCase "should process empty string correctly" <| fun _ ->
+                let result = DecodeMapping.extractMapping("")
+                Expect.equal result "" "should process empty string correctly"
+        ]
 
-    let result = DecodeMapping.extractMapping(input)
+        // ==========================================
+        // isValidTsvInput
+        // ==========================================
+        testList "isValidTsvInput" [
+            testCase "should return true for correct TSV header" <| fun _ ->
+                let validTSV = "predicate_id\tmapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+                let result = DecodeMapping.isValidTsvInput(validTSV)
+                Expect.isTrue result "should return true for correct TSV header"
 
-    Assert.Equal(expected, result)
+            testCase "should return false, when 'predicate_id' is missing" <| fun _ ->
+                let invalidTsv = "mapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+                let result = DecodeMapping.isValidTsvInput(invalidTsv)
+                Expect.isFalse result "should return false, when 'predicate_id' is missing"
 
-[<Fact>]
-let ``extractMapping should process empty string correctly`` () =
-    let result = DecodeMapping.extractMapping("")
+            testCase "should return false, when 'mapping_justification' is missing" <| fun _ ->
+                let invalidTsv = "predicate_id\tconfidence\nKF:01\t0.95"
+                let result = DecodeMapping.isValidTsvInput(invalidTsv)
+                Expect.isFalse result "should return false, when 'mapping_justification' is missing"
 
-    Assert.Equal("", result)
+            testCase "should return false, when 'predicate_id' & 'mapping_justification' are missing" <| fun _ ->
+                let invalidTsv = "confidence\tobject_label\n0.99\tapple"
+                let result = DecodeMapping.isValidTsvInput(invalidTsv)
+                Expect.isFalse result "should return false, when 'predicate_id' & 'mapping_justification' are missing"
 
+            testCase "TSV with inconsistent column counts should return false" <| fun _ ->
+                let badColumnTsv = "predicate_id\tmapping_justification\nKF:01"
+                let result = DecodeMapping.isValidTsvInput(badColumnTsv)
+                Expect.isFalse result "TSV with inconsistent column counts should return false"
+        ]
 
-// ==========================================
-// isValidTsvInput
-// ==========================================
-[<Fact>]
-let ``isValidTsvInput should return true for correct TSV header`` () =
-    let validTSV = "predicate_id\tmapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+        // ==========================================
+        // ParseTsvtoMappings
+        // ==========================================
+        testList "ParseTsvtoMappings" [
+            testCase "DecodeMapping should parse valid TSV in mapping Object" <| fun _ ->
+                let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tsemapv:ManualMappingCuration\t0.95"
+                let result = DecodeMapping.DecodeMapping(tsv)
+                let mapping = result.[0]
 
-    let result = DecodeMapping.isValidTsvInput(validTSV)
+                Expect.equal mapping.Predicate_id.Value "KF:01" "Predicate_id should be parsed correctly"
+                Expect.equal mapping.Mapping_justification.Value "semapv:ManualMappingCuration" "Mapping_justification should be parsed correctly"
+                Expect.equal mapping.Confidence (Some 0.95) "Confidence should be parsed as floating number"
+                Expect.equal mapping.Subject_id None "None existing Fields should be left empty"
 
-    Assert.True(result)
+            testCase "DecodeMapping should throw exception if tsv is invalid" <| fun _ ->
+                let invalidTsv = "subject_id\tconfidence\nKF:01\t0.95"
+                
+                let exceptionThrown = 
+                    try 
+                        DecodeMapping.DecodeMapping(invalidTsv) |> ignore
+                        None
+                    with ex -> 
+                        Some ex
 
-[<Fact>]
-let ``isValidTsvInput should return false, when 'predicate_id' is missing`` () =
-    let invalidTsv = "mapping_justification\nKF:01\tsemapv:ManualMappingCuration"
+                Expect.isSome exceptionThrown "Exception should be thrown, when TSV-input is invalid"
+                Expect.stringContains exceptionThrown.Value.Message "Invalid TSV Input" "Exception should contain 'Invalid TSV Input'"
 
-    let result = DecodeMapping.isValidTsvInput(invalidTsv)
+            testCase "DecodeMapping should return None for empty double-cells" <| fun _ ->
+                let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tsemapv:ManualMappingCuration\t"
+                let result = DecodeMapping.DecodeMapping(tsv)
+                Expect.equal result.[0].Confidence None "DecodeMapping should return None for empty double-cells"
 
-    Assert.False(result)
-
-[<Fact>]
-let ``isValidTsvInput should return false, when 'mapping_justification' is missing`` () =
-    let invalidTsv = "predicate_id\tconfidence\nKF:01\t0.95"
-
-    let result = DecodeMapping.isValidTsvInput(invalidTsv)
-
-    Assert.False(result)
-
-[<Fact>]
-let ``isValidTsvInput should return false, when 'predicate_id' & 'mapping_justification' are missing`` () =
-    let invalidTsv = "confidence\tobject_label\n0.99\tapple"
-
-    let result = DecodeMapping.isValidTsvInput(invalidTsv)
-
-    Assert.False(result)
-
-[<Fact>]
-let ``TSV with inconsistent column counts should return false`` () =
-    let badColumnTsv = "predicate_id\tmapping_justification\nKF:01"
-
-    let result = DecodeMapping.isValidTsvInput(badColumnTsv)
-
-    Assert.False(result)
-
-// ==========================================
-// ParseTsvtoMappings
-// ==========================================
-[<Fact>]
-let ``DecodeMapping should parse valid TSV in mapping Object`` () =
-    let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tsemapv:ManualMappingCuration\t0.95"
-
-    let result = DecodeMapping.DecodeMapping(tsv)
-
-    let mapping = result.[0]
-
-    Assert.True(mapping.Predicate_id.IsSome)
-    Assert.Equal("KF:01", mapping.Predicate_id.Value)
-
-    Assert.True(mapping.Mapping_justification.IsSome)
-    Assert.Equal("semapv:ManualMappingCuration", mapping.Mapping_justification.Value)
-
-    Assert.Equal(Some 0.95, mapping.Confidence)
-    Assert.Equal(None, mapping.Subject_id)
-
-[<Fact>]
-let ``DecodeMapping should throw exception if tsv is invalid`` () =
-    let invalidTsv = "subject_id\tconfidence\nKF:01\t0.95"
-
-    let ex = Assert.Throws<Exception>(fun () ->
-        DecodeMapping.DecodeMapping(invalidTsv) |> ignore
-    )
-
-    Assert.Contains("Invalid TSV Input", ex.Message)
-
-
-[<Fact>]
-let ``DecodeMapping should return None for empty double-cells`` () =
-    let tsv = "predicate_id\tmapping_justification\tconfidence\nKF:01\tsemapv:ManualMappingCuration\t"
-
-    let result = DecodeMapping.DecodeMapping(tsv)
-
-    Assert.Equal(None, result.[0].Confidence)
-
-[<Fact>]
-let ``DecodeMapping should return None for empty cells`` () =
-    let tsv = "predicate_id\tmapping_justification\tconfidence\tRecord_id\nKF:01\tsemapv:ManualMappingCuration\t\tINSDC:000001"
-
-    let result = DecodeMapping.DecodeMapping(tsv)
-
-    Assert.Equal(None, result.[0].Confidence)
+            testCase "DecodeMapping should return None for empty cells" <| fun _ ->
+                let tsv = "predicate_id\tmapping_justification\tconfidence\tRecord_id\nKF:01\tsemapv:ManualMappingCuration\t\tINSDC:000001"
+                let result = DecodeMapping.DecodeMapping(tsv)
+                Expect.equal result.[0].Confidence None "DecodeMapping should return None for empty cells"
+        ]
+    ]
