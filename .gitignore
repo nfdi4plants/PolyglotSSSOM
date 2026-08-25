@@ -428,5 +428,11 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# Ignore  .fs.js output files
-js
+# Polyglot build/package output
+artifacts/
+dist/
+pkg/
+node_modules/
+.venv/
+src/SSSOM/py/
+**/*.fs.js

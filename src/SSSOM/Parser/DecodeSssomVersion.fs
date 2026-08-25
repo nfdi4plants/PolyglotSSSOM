@@ -5,7 +5,7 @@ open Fable.Core
 
 [<AttachMembers>]
 type DecodeSssomVersion() =
-    static member Decode =
+    static member Decode yamlElement =
         Decode.object (fun get ->
             let rawVersion = get.Optional.Field "sssom_version" Decode.string
 
@@ -18,4 +18,4 @@ type DecodeSssomVersion() =
                 | Some unknown -> failwith $"Error: SSSOM Version not found {unknown}"
                 | None -> None
             parsedVersion
-        )
+        ) yamlElement

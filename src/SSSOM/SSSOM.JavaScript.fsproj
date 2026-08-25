@@ -1,20 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>PolyglotSSSOM</AssemblyName>
+    <AssemblyName>PolyglotSSSOM.JavaScript</AssemblyName>
     <RootNamespace>SSSOM</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageId>PolyglotSSSOM</PackageId>
-    <Authors>DataPLANT</Authors>
-    <Description>A cross-runtime YAML metadata plus TSV implementation of SSSOM.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/nfdi4plants/PolyglotSSSOM</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/nfdi4plants/PolyglotSSSOM.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>SSSOM;ontology-mapping;fable-dotnet;fable-javascript;fable-python</PackageTags>
-    <FablePackageType>library</FablePackageType>
+    <IsPackable>false</IsPackable>
+    <DefineConstants>FABLE_COMPILER;FABLE_COMPILER_JAVASCRIPT;FABLE_COMPILER_TYPESCRIPT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,14 +36,6 @@
   <ItemGroup>
     <PackageReference Include="Fable.Core" Version="5.2.0" />
     <PackageReference Include="YAMLicious" Version="1.0.0" />
-    <PackageReference Include="Fable.Package.SDK" Version="1.4.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

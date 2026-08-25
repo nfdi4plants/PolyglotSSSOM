@@ -6,7 +6,7 @@ open YAMLicious
 [<AttachMembers>]
 type DecodeExtensionDefinition() =
     
-    static member Decode =
+    static member Decode yamlElement =
         Decode.object (fun get -> 
             
             let parseEntityReference reference =
@@ -19,4 +19,4 @@ type DecodeExtensionDefinition() =
                 ?slot_name = get.Optional.Field "slot_name" Decode.string,
                 ?type_hint = get.Optional.Field "type_hint" Decode.string
             )
-        )
+        ) yamlElement

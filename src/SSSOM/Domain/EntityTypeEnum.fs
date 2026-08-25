@@ -1,21 +1,18 @@
 ﻿namespace SSSOM
 
-open Fable.Core
-
-[<StringEnum>]
 type EntityTypeEnum =
-    | [<CompiledName("owl class")>] OwlClass
-    | [<CompiledName("owl object property")>] OwlObjectProperty
-    | [<CompiledName("owl data property")>] OwlDataProperty
-    | [<CompiledName("owl annotation property")>] OwlAnnotationProperty
-    | [<CompiledName("owl named individual")>] OwlNamedIndividual
-    | [<CompiledName("skos concept")>] SkosConcept
-    | [<CompiledName("rdfs resource")>] RedfsResource
-    | [<CompiledName("rdfs class")>] RdfsClass
-    | [<CompiledName("rdfs literal")>] RdfsLiteral
-    | [<CompiledName("rdfs datatype")>] RdfsDatatype
-    | [<CompiledName("rdf property")>] RdfProperty
-    | [<CompiledName("composed entity expression")>] ComposedEntityExpression
+    | OwlClass
+    | OwlObjectProperty
+    | OwlDataProperty
+    | OwlAnnotationProperty
+    | OwlNamedIndividual
+    | SkosConcept
+    | RedfsResource
+    | RdfsClass
+    | RdfsLiteral
+    | RdfsDatatype
+    | RdfProperty
+    | ComposedEntityExpression
 
 module EntityTypeEnum =
     

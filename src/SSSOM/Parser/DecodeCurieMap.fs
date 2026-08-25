@@ -6,7 +6,7 @@ open YAMLicious
 [<AttachMembers>]
 type DecodeCurieMap() =
 
-    static member Decode =
+    static member Decode yamlElement =
         Decode.object (fun get ->
         let curieDict = get.Optional.Field "curie_map" (Decode.dict id Decode.string)
         let curieList =
@@ -21,4 +21,4 @@ type DecodeCurieMap() =
                 Some output
             | None -> Some [||]
         curieList
-        )
+        ) yamlElement

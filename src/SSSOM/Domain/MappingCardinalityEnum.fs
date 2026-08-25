@@ -1,16 +1,13 @@
 ﻿namespace SSSOM
 
-open Fable.Core
-
-[<StringEnum>]
 type MappingCardinalityEnum =
-    | [<CompiledName("1:1")>] OneToOne
-    | [<CompiledName("1:n")>] OneToMany
-    | [<CompiledName("n:1")>] ManyToOne
-    | [<CompiledName("n:n")>] ManyToMany
-    | [<CompiledName("1:0")>] OneToNone
-    | [<CompiledName("0:1")>] NoneToOne
-    | [<CompiledName("0:0")>] NoneToNone
+    | OneToOne
+    | OneToMany
+    | ManyToOne
+    | ManyToMany
+    | OneToNone
+    | NoneToOne
+    | NoneToNone
 
 module MappingCardinalityEnum =
     let create (text: string) =

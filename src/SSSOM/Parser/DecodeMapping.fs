@@ -92,7 +92,17 @@ type DecodeMapping() =
             let getOptionalDouble (colName: string) =
                 match getOptionalString colName with
                 | Some strValue ->
-                    match Double.TryParse(strValue, Globalization.CultureInfo.InvariantCulture) with
+#if FABLE_COMPILER
+                    match Double.TryParse(strValue) with
+#else
+                    match
+                        Double.TryParse(
+                            strValue,
+                            Globalization.NumberStyles.Float ||| Globalization.NumberStyles.AllowThousands,
+                            Globalization.CultureInfo.InvariantCulture
+                        )
+                    with
+#endif
                     | true, value -> Some value
                     | _ -> None
                 | None -> 

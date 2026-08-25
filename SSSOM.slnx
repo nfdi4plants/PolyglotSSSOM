@@ -1,14 +1,25 @@
 <Solution>
   <Folder Name="/project/">
+    <File Path=".config/dotnet-tools.json" />
     <File Path=".gitignore" />
-    <File Path="dotnet-tools.json" />
+    <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="RELEASE_NOTES.md" />
+    <File Path="package.json" />
+    <File Path="pyproject.toml" />
+  </Folder>
+  <Folder Name="/build/">
+    <Project Path="build/build.fsproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/SSSOM/SSSOM.JavaScript.fsproj" />
+    <Project Path="src/SSSOM/SSSOM.Python.fsproj" />
     <Project Path="src/SSSOM/SSSOM.fsproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/SSSOM.Tests/SSSOM.JavaScript.Tests.fsproj" />
+    <Project Path="tests/SSSOM.Tests/SSSOM.Python.Tests.fsproj" />
     <Project Path="tests/SSSOM.Tests/SSSOM.Tests.fsproj" />
   </Folder>
 </Solution>

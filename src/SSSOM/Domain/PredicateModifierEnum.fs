@@ -1,10 +1,7 @@
 ﻿namespace SSSOM
 
-open Fable.Core
-
-[<StringEnum>]
 type PredicateModifierEnum =
-    | [<CompiledName("Not")>] Not
+    | Not
 
 module PredicateModifierEnum =
     let create (text: string) =

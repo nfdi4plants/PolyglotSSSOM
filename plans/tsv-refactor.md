@@ -1,8 +1,11 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Draft planning snapshot - explicitly open to future iteration.**
+> **Status: Phase 1 implementation authorized on 2026-08-25; later phases remain planning snapshots.**
 >
-> Captured on 2026-08-24. This document records the current decisions and is not authorization to begin implementation without a separate explicit request.
+> Captured on 2026-08-24. The project owner authorized the build-and-package
+> foundation on 2026-08-25. That authorization does not extend to package
+> publication, the domain/codec refactor, specification completion, or
+> downstream BioFSharp work.
 
 ## Summary
 
@@ -30,9 +33,13 @@
 ### 1. Build and package foundation
 
 - Move the Fable tool manifest to `.config/dotnet-tools.json`, pin Fable `5.13.0`, and disable roll-forward.
-- Use YAMLicious `1.0.2`, Fable.Core `5.2.0`, Fable.Python `5.4.0`, Fable.Pyxpecto `2.0.0`, and Fable.Package.SDK `1.4.0`.
+- Pin the build SDK to the .NET 10.0.300 feature band with latest-patch roll-forward. The shipped library still targets `netstandard2.0`; tests target `net8.0`.
+- Use the public stable YAMLicious `1.0.0`, Fable.Core `5.2.0`, Fable.Python `5.4.0`, Fable.Pyxpecto `2.0.0`, Fable.Package.SDK `1.4.0`, and Python `fable-library` `5.13.0`.
 - Target `netstandard2.0`; add synchronized JavaScript and Python input projects and a FAKE build modeled after DataHubClient.
 - Produce `PolyglotSSSOM`, `@nfdi4plants/polyglot-sssom`, and `polyglot-sssom`. Keep package versions prerelease until SSSOM 1.1 is final.
+- Start all three packages at logical version `0.1.0-alpha.1` (`0.1.0a1` on Python), with `RELEASE_NOTES.md` as the single version source.
+- Require Node 22+ and Python 3.12+. Native npm/Python package roots expose only their version during Phase 1; the curated model/codec exports belong to later phases.
+- Add a thin, read-only CI job that invokes the FAKE package-smoke target and uploads artifacts. It must not publish them.
 - Remove checked-in generated Fable output and ignore generated JavaScript/Python directories.
 
 ### 2. Portable domain model
