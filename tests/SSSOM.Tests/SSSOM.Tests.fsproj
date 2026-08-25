@@ -7,12 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="DecodeMappingTest.fs" />
-    <Compile Include="DecodeMappingSetTest.fs" />
-    <Compile Include="EncodeMappingTest.fs" />
-    <Compile Include="EncodeMappingSetTest.fs" />
-    <Compile Include="EncodeSssomDocumentTest.fs" />
-    <Compile Include="DecodeSssomDocumentTest.fs" />
+    <Compile Include="DomainTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 

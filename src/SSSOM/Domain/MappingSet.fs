@@ -2,228 +2,214 @@ namespace SSSOM
 
 open Fable.Core
 
+/// Represents portable SSSOM mapping-set metadata.
 [<AttachMembers>]
 type MappingSet(
-    ?Sssom_version: SssomVersion,
-    ?Curie_map: array<CurieMap>,
-    ?Mapping_set_id: NonRelativeURI,
-    ?Mapping_set_version: string,
-    ?Mapping_set_source: NonRelativeURI,
-    ?Mapping_set_title: string,
-    ?Mapping_set_description: string,
-    ?Mapping_set_confidence: string,
-    ?Creator_id: EntityReference,
-    ?Creator_label: string,
-    ?License: NonRelativeURI,
-    ?Subject_type: EntityTypeEnum,
-    ?Subject_source: EntityReference,
-    ?Subject_source_version: string,
-    ?Object_type: EntityTypeEnum,
-    ?Object_source: EntityReference,
-    ?Object_source_version: string,
-    ?Predicate_type: EntityTypeEnum,
-    ?Mapping_provider: NonRelativeURI,
-    ?Cardinality_scope: string,
-    ?Mapping_tool: string,
-    ?Mapping_tool_id: EntityReference,
-    ?Mapping_tool_version: string,
-    ?Mapping_date: Date,
-    ?Publication_date: Date,
-    ?Subject_match_field: EntityReference,
-    ?Object_match_field: EntityReference,
-    ?Subject_preprocessing: EntityReference,
-    ?Object_preprocessing: EntityReference,
-    ?Similarity_measure: string,
-    ?Curation_rule: EntityReference,
-    ?Curation_rule_text: string,
-    ?See_also: NonRelativeURI,
-    ?Issue_tracker: NonRelativeURI,
-    ?Other: string,
-    ?Comment: string,
-    ?Extension_definitions: array<ExtensionDefinition>
+    mappingSetId: UriReference,
+    license: UriReference,
+    ?sssomVersion: SssomVersion,
+    ?curieMap: PrefixEntry array,
+    ?mappingSetVersion: string,
+    ?mappingSetSource: UriReference array,
+    ?mappingSetTitle: string,
+    ?mappingSetDescription: string,
+    ?mappingSetConfidence: double,
+    ?creatorId: EntityReference array,
+    ?creatorLabel: string array,
+    ?subjectType: EntityType,
+    ?subjectSource: EntityReference,
+    ?subjectSourceVersion: string,
+    ?objectType: EntityType,
+    ?objectSource: EntityReference,
+    ?objectSourceVersion: string,
+    ?predicateType: EntityType,
+    ?mappingProvider: UriReference,
+    ?cardinalityScope: string array,
+    ?mappingTool: string,
+    ?mappingToolId: EntityReference,
+    ?mappingToolVersion: string,
+    ?mappingDate: SssomDate,
+    ?publicationDate: SssomDate,
+    ?subjectMatchField: EntityReference array,
+    ?objectMatchField: EntityReference array,
+    ?subjectPreprocessing: EntityReference array,
+    ?objectPreprocessing: EntityReference array,
+    ?similarityMeasure: string,
+    ?curationRule: EntityReference array,
+    ?curationRuleText: string array,
+    ?seeAlso: UriReference array,
+    ?issueTracker: UriReference,
+    ?other: string,
+    ?comment: string,
+    ?extensionDefinitions: ExtensionDefinition array,
+    ?extensionValues: ExtensionValue array
 ) =
-    let mutable _sssom_version = Sssom_version
-    let mutable _curie_map = Curie_map
-    let mutable _mapping_set_id = Mapping_set_id
-    let mutable _mapping_set_version = Mapping_set_version
-    let mutable _mapping_set_source = Mapping_set_source
-    let mutable _mapping_set_title = Mapping_set_title
-    let mutable _mapping_set_description = Mapping_set_description
-    let mutable _mapping_set_confidence = Mapping_set_confidence
-    let mutable _creator_id = Creator_id
-    let mutable _creator_label = Creator_label
-    let mutable _license = License
-    let mutable _subject_type = Subject_type
-    let mutable _subject_source = Subject_source
-    let mutable _subject_source_version = Subject_source_version
-    let mutable _object_type = Object_type
-    let mutable _object_source = Object_source
-    let mutable _object_source_version = Object_source_version
-    let mutable _predicate_type = Predicate_type
-    let mutable _mapping_provider = Mapping_provider
-    let mutable _cardinality_scope = Cardinality_scope
-    let mutable _mapping_tool = Mapping_tool
-    let mutable _mapping_tool_id = Mapping_tool_id
-    let mutable _mapping_tool_version = Mapping_tool_version
-    let mutable _mapping_date = Mapping_date
-    let mutable _publication_date = Publication_date
-    let mutable _subject_match_field = Subject_match_field
-    let mutable _object_match_field = Object_match_field
-    let mutable _subject_preprocessing = Subject_preprocessing
-    let mutable _object_preprocessing = Object_preprocessing
-    let mutable _similarity_measure = Similarity_measure
-    let mutable _curation_rule = Curation_rule
-    let mutable _curation_rule_text = Curation_rule_text
-    let mutable _see_also = See_also
-    let mutable _issue_tracker = Issue_tracker
-    let mutable _other = Other
-    let mutable _comment = Comment
-    let mutable _extension_definitions = Extension_definitions
+    let mutable mappingSetId = ModelValue.required (nameof mappingSetId) mappingSetId
+    let mutable license = ModelValue.required (nameof license) license
+    let mutable sssomVersion = sssomVersion
+    let mutable curieMap = ModelValue.arrayOrEmpty curieMap
+    let mutable mappingSetVersion = mappingSetVersion
+    let mutable mappingSetSource = ModelValue.arrayOrEmpty mappingSetSource
+    let mutable mappingSetTitle = mappingSetTitle
+    let mutable mappingSetDescription = mappingSetDescription
+    let mutable mappingSetConfidence = mappingSetConfidence
+    let mutable creatorId = ModelValue.arrayOrEmpty creatorId
+    let mutable creatorLabel = ModelValue.arrayOrEmpty creatorLabel
+    let mutable subjectType = subjectType
+    let mutable subjectSource = subjectSource
+    let mutable subjectSourceVersion = subjectSourceVersion
+    let mutable objectType = objectType
+    let mutable objectSource = objectSource
+    let mutable objectSourceVersion = objectSourceVersion
+    let mutable predicateType = predicateType
+    let mutable mappingProvider = mappingProvider
+    let mutable cardinalityScope = ModelValue.arrayOrEmpty cardinalityScope
+    let mutable mappingTool = mappingTool
+    let mutable mappingToolId = mappingToolId
+    let mutable mappingToolVersion = mappingToolVersion
+    let mutable mappingDate = mappingDate
+    let mutable publicationDate = publicationDate
+    let mutable subjectMatchField = ModelValue.arrayOrEmpty subjectMatchField
+    let mutable objectMatchField = ModelValue.arrayOrEmpty objectMatchField
+    let mutable subjectPreprocessing = ModelValue.arrayOrEmpty subjectPreprocessing
+    let mutable objectPreprocessing = ModelValue.arrayOrEmpty objectPreprocessing
+    let mutable similarityMeasure = similarityMeasure
+    let mutable curationRule = ModelValue.arrayOrEmpty curationRule
+    let mutable curationRuleText = ModelValue.arrayOrEmpty curationRuleText
+    let mutable seeAlso = ModelValue.arrayOrEmpty seeAlso
+    let mutable issueTracker = issueTracker
+    let mutable other = other
+    let mutable comment = comment
+    let mutable extensionDefinitions = ModelValue.arrayOrEmpty extensionDefinitions
+    let mutable extensionValues = ModelValue.arrayOrEmpty extensionValues
 
-    member this.Sssom_version
-        with get() = _sssom_version
-        and set value = _sssom_version <- value
+    /// Gets or sets the required mapping-set identifier.
+    member _.MappingSetId
+        with get () = mappingSetId
+        and set value = mappingSetId <- ModelValue.required (nameof value) value
 
-    member this.Curie_map
-        with get() = _curie_map
-        and set value = _curie_map <- value
+    /// Gets or sets the required mapping-set license.
+    member _.License
+        with get () = license
+        and set value = license <- ModelValue.required (nameof value) value
 
-    member this.Mapping_set_id
-        with get() = _mapping_set_id
-        and set value = _mapping_set_id <- value
-    
-    member this.Mapping_set_version
-        with get() = _mapping_set_version
-        and set value = _mapping_set_version <- value
+    /// Gets or sets the explicitly declared SSSOM version.
+    member _.SssomVersion with get () = sssomVersion and set value = sssomVersion <- value
 
-    member this.Mapping_set_source
-        with get() = _mapping_set_source
-        and set value = _mapping_set_source <- value
-    
-    member this.Mapping_set_title
-        with get() = _mapping_set_title
-        and set value = _mapping_set_title <- value
+    /// Gets or sets document CURIE prefix entries.
+    member _.CurieMap
+        with get () = curieMap
+        and set value = curieMap <- ModelValue.nonNullArray value
 
-    member this.Mapping_set_description
-        with get() = _mapping_set_description
-        and set value = _mapping_set_description <- value
+    /// Gets or sets the mapping-set version.
+    member _.MappingSetVersion with get () = mappingSetVersion and set value = mappingSetVersion <- value
 
-    member this.Mapping_set_confidence
-        with get() = _mapping_set_confidence
-        and set value = _mapping_set_confidence <- value
+    /// Gets or sets mapping sets from which this set was derived.
+    member _.MappingSetSource
+        with get () = mappingSetSource
+        and set value = mappingSetSource <- ModelValue.nonNullArray value
 
-    member this.Creator_id
-        with get() = _creator_id
-        and set value = _creator_id <- value
-    
-    member this.Creator_label
-        with get() = _creator_label
-        and set value = _creator_label <- value
-    
-    member this.License
-        with get() = _license
-        and set value = _license <- value
+    /// Gets or sets the mapping-set title.
+    member _.MappingSetTitle with get () = mappingSetTitle and set value = mappingSetTitle <- value
+    /// Gets or sets the mapping-set description.
+    member _.MappingSetDescription with get () = mappingSetDescription and set value = mappingSetDescription <- value
+    /// Gets or sets mapping-set confidence without materializing a default.
+    member _.MappingSetConfidence with get () = mappingSetConfidence and set value = mappingSetConfidence <- value
 
-    member this.Subject_type
-        with get() = _subject_type
-        and set value = _subject_type <- value
-    
-    member this.Subject_source
-        with get() = _subject_source
-        and set value = _subject_source <- value
+    /// Gets or sets creator identifiers.
+    member _.CreatorId
+        with get () = creatorId
+        and set value = creatorId <- ModelValue.nonNullArray value
 
-    member this.Subject_source_version
-        with get() = _subject_source_version
-        and set value = _subject_source_version <- value
+    /// Gets or sets creator labels.
+    member _.CreatorLabel
+        with get () = creatorLabel
+        and set value = creatorLabel <- ModelValue.nonNullArray value
 
-    member this.Object_type
-        with get() = _object_type
-        and set value = _object_type <- value
+    /// Gets or sets the propagated subject type.
+    member _.SubjectType with get () = subjectType and set value = subjectType <- value
+    /// Gets or sets the propagated subject source.
+    member _.SubjectSource with get () = subjectSource and set value = subjectSource <- value
+    /// Gets or sets the propagated subject source version.
+    member _.SubjectSourceVersion with get () = subjectSourceVersion and set value = subjectSourceVersion <- value
+    /// Gets or sets the propagated object type.
+    member _.ObjectType with get () = objectType and set value = objectType <- value
+    /// Gets or sets the propagated object source.
+    member _.ObjectSource with get () = objectSource and set value = objectSource <- value
+    /// Gets or sets the propagated object source version.
+    member _.ObjectSourceVersion with get () = objectSourceVersion and set value = objectSourceVersion <- value
+    /// Gets or sets the v1.1 propagated predicate type.
+    member _.PredicateType with get () = predicateType and set value = predicateType <- value
+    /// Gets or sets the mapping provider.
+    member _.MappingProvider with get () = mappingProvider and set value = mappingProvider <- value
 
-    member this.Object_Source
-        with get() = _object_source
-        and set value = _object_source <- value
+    /// Gets or sets v1.1 cardinality-scope values.
+    member _.CardinalityScope
+        with get () = cardinalityScope
+        and set value = cardinalityScope <- ModelValue.nonNullArray value
 
-    member this.Object_source_version
-        with get() = _object_source_version
-        and set value = _object_source_version <- value
+    /// Gets or sets the mapping tool name.
+    member _.MappingTool with get () = mappingTool and set value = mappingTool <- value
+    /// Gets or sets the v1.1 mapping tool identifier.
+    member _.MappingToolId with get () = mappingToolId and set value = mappingToolId <- value
+    /// Gets or sets the mapping tool version.
+    member _.MappingToolVersion with get () = mappingToolVersion and set value = mappingToolVersion <- value
+    /// Gets or sets the propagated mapping date.
+    member _.MappingDate with get () = mappingDate and set value = mappingDate <- value
+    /// Gets or sets the publication date.
+    member _.PublicationDate with get () = publicationDate and set value = publicationDate <- value
 
-    member this.Predicate_type
-        with get() = _predicate_type
-        and set value = _predicate_type <- value
+    /// Gets or sets propagated subject match fields.
+    member _.SubjectMatchField
+        with get () = subjectMatchField
+        and set value = subjectMatchField <- ModelValue.nonNullArray value
 
-    member this.Mapping_provider
-        with get() = _mapping_provider
-        and set value = _mapping_provider <- value
-    
-    member this.Cardinality_scope
-        with get() = _cardinality_scope
-        and set value = _cardinality_scope <- value
+    /// Gets or sets propagated object match fields.
+    member _.ObjectMatchField
+        with get () = objectMatchField
+        and set value = objectMatchField <- ModelValue.nonNullArray value
 
-    member this.Mapping_tool
-        with get() = _mapping_tool
-        and set value = _mapping_tool <- value
+    /// Gets or sets propagated subject preprocessing operations.
+    member _.SubjectPreprocessing
+        with get () = subjectPreprocessing
+        and set value = subjectPreprocessing <- ModelValue.nonNullArray value
 
-    member this.Mapping_tool_id
-        with get() = _mapping_tool_id
-        and set value = _mapping_tool_id <- value
+    /// Gets or sets propagated object preprocessing operations.
+    member _.ObjectPreprocessing
+        with get () = objectPreprocessing
+        and set value = objectPreprocessing <- ModelValue.nonNullArray value
 
-    member this.Mapping_tool_version
-        with get() = _mapping_tool_version
-        and set value = _mapping_tool_version <- value
+    /// Gets or sets the v1.1 mapping-set similarity measure.
+    member _.SimilarityMeasure with get () = similarityMeasure and set value = similarityMeasure <- value
 
-    member this.Mapping_date
-        with get() = _mapping_date
-        and set value = _mapping_date <- value
+    /// Gets or sets v1.1 mapping-set curation rules.
+    member _.CurationRule
+        with get () = curationRule
+        and set value = curationRule <- ModelValue.nonNullArray value
 
-    member this.Publication_date
-        with get() = _publication_date
-        and set value = _publication_date <- value
+    /// Gets or sets v1.1 mapping-set curation-rule text values.
+    member _.CurationRuleText
+        with get () = curationRuleText
+        and set value = curationRuleText <- ModelValue.nonNullArray value
 
-    member this.Subject_match_field
-        with get() = _subject_match_field
-        and set value = _subject_match_field <- value
+    /// Gets or sets related URI values.
+    member _.SeeAlso
+        with get () = seeAlso
+        and set value = seeAlso <- ModelValue.nonNullArray value
 
-    member this.Object_match_field
-        with get() = _object_match_field
-        and set value = _object_match_field <- value
+    /// Gets or sets the issue tracker URI.
+    member _.IssueTracker with get () = issueTracker and set value = issueTracker <- value
+    /// Gets or sets the free-form other value.
+    member _.Other with get () = other and set value = other <- value
+    /// Gets or sets the mapping-set comment.
+    member _.Comment with get () = comment and set value = comment <- value
 
-    member this.Subject_preprocessing
-        with get() = _subject_preprocessing
-        and set value = _subject_preprocessing <- value
+    /// Gets or sets declared extension definitions.
+    member _.ExtensionDefinitions
+        with get () = extensionDefinitions
+        and set value = extensionDefinitions <- ModelValue.nonNullArray value
 
-    member this.Object_preprocessing
-        with get() = _object_preprocessing
-        and set value = _object_preprocessing <- value
-
-    member this.Similarity_measure
-        with get() = _similarity_measure
-        and set value = _similarity_measure <- value
-
-    member this.Curation_rule
-        with get() = _curation_rule
-        and set value = _curation_rule <- value
-
-    member this.Curation_rule_text
-        with get() = _curation_rule_text
-        and set value = _curation_rule_text <- value
-
-    member this.See_also
-        with get() = _see_also
-        and set value = _see_also <- value
-
-    member this.Issue_tracker
-        with get() = _issue_tracker
-        and set value = _issue_tracker <- value
-
-    member this.Other
-        with get() = _other
-        and set value = _other <- value
-
-    member this.Comment
-        with get() = _comment
-        and set value = _comment <- value
-
-    member this.Extension_definitions
-        with get() = _extension_definitions
-        and set value = _extension_definitions <- value
+    /// Gets or sets declared extension values retained in metadata.
+    member _.ExtensionValues
+        with get () = extensionValues
+        and set value = extensionValues <- ModelValue.nonNullArray value

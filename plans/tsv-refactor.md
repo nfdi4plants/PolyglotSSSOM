@@ -1,11 +1,11 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Build/package foundation and specification bundle implemented; domain and codec phases remain planning snapshots.**
+> **Status: Build/package foundation, specification bundle, and portable domain model implemented; codec phase remains a planning snapshot.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
-> foundation and subsequent specification bundle work on 2026-08-25. That
-> authorization does not extend to package publication, the domain/codec
-> refactor, or downstream BioFSharp work.
+> foundation, specification bundle, and subsequent portable-domain-model work
+> on 2026-08-25. That authorization does not extend to package publication, the
+> TSV/YAML codec refactor, or downstream BioFSharp work.
 
 ## Summary
 
@@ -44,6 +44,10 @@
 - Remove checked-in generated Fable output and ignore generated JavaScript/Python directories.
 
 ### 2. Portable domain model
+
+Implemented on 2026-08-25. The public npm and Python package roots now expose
+the curated model alongside the NuGet API; the POC codec was removed rather
+than retained as a conflicting, unsupported implementation.
 
 - Replace the POC model with documented `[<AttachMembers>]` mutable classes using explicit backing fields and PascalCase public properties.
 - Keep `SssomDocument` as metadata plus a mapping array. Required constructor values remain required; optional scalar values use `option`, while multivalued slots use arrays with empty arrays representing no values.

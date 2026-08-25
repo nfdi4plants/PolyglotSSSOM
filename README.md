@@ -4,8 +4,9 @@ PolyglotSSSOM is a cross-runtime YAML-metadata-plus-TSV implementation of the
 [Simple Standard for Sharing Ontological Mappings (SSSOM)](https://mapping-commons.github.io/sssom/).
 It is written once in F# and built for .NET, JavaScript, and Python.
 
-The current `0.1.0-alpha.1` line is an implementation prerelease. Its domain and
-codec API will change while the SSSOM v1.0/v1.1 refactor is completed.
+The current `0.1.0-alpha.1` line is an implementation prerelease. Its portable
+domain model is available, while the replacement TSV/YAML codec is still under
+development and is not exposed yet.
 The exact stable-v1.0 and pinned-v1.1 specification sources are documented in
 [`spec/UPSTREAM.md`](spec/UPSTREAM.md).
 
@@ -38,6 +39,7 @@ Generated output is written below `artifacts/` and is never committed.
 - npm: `@nfdi4plants/polyglot-sssom`
 - PyPI: `polyglot-sssom` (`import polyglot_sssom`)
 
-During Phase 1 the native npm and Python package roots expose only `version` and
-`__version__`, respectively. Curated domain and codec exports are part of later
-refactor phases.
+All three packages expose the portable mapping-set, mapping, lexical-value,
+extension, descriptor, and CURIE APIs. Optional scalars remain absent and
+multivalued slots use empty arrays for zero values. The old proof-of-concept
+decoder and encoder have been removed pending the version-aware codec phase.

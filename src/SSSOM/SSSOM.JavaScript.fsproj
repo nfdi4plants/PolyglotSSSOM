@@ -10,27 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Domain\MappingCardinalityEnum.fs" />
-    <Compile Include="Domain\PredicateModifierEnum.fs" />
-    <Compile Include="Domain\Date.fs" />
-    <Compile Include="Domain\EntityTypeEnum.fs" />
-    <Compile Include="Domain\NonRelativeUri.fs" />
-    <Compile Include="Domain\SssomVersion.fs" />
+    <Compile Include="Domain\Enums.fs" />
+    <Compile Include="Domain\LexicalValues.fs" />
+    <Compile Include="Domain\Extensions.fs" />
     <Compile Include="Domain\CurieMap.fs" />
-    <Compile Include="Domain\EntityReference.fs" />
-    <Compile Include="Domain\ExtensionDefinition.fs" />
+    <Compile Include="Domain\Descriptors.fs" />
     <Compile Include="Domain\Mapping.fs" />
     <Compile Include="Domain\MappingSet.fs" />
     <Compile Include="Domain\SssomDocument.fs" />
-    <Compile Include="Parser\DecodeExtensionDefinition.fs" />
-    <Compile Include="Parser\DecodeSssomVersion.fs" />
-    <Compile Include="Parser\DecodeCurieMap.fs" />
-    <Compile Include="Parser\DecodeMapping.fs" />
-    <Compile Include="Parser\DecodeMappingSet.fs" />
-    <Compile Include="Parser\EncodeMapping.fs" />
-    <Compile Include="Parser\EncodeMappingSet.fs" />
-    <Compile Include="Parser\DecodeSssomDocument.fs" />
-    <Compile Include="Parser\EncodeSssomDocument.fs" />
   </ItemGroup>
 
   <ItemGroup>

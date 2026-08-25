@@ -140,12 +140,62 @@ let private npmManifest =
 }
 """
 
+let private javaScriptIndex =
+    $$"""export const version = "{{packageVersion.SemVer}}";
+export { EntityReference, SssomDate, UriReference } from "./internal/Domain/LexicalValues.js";
+export { ExtensionDefinition, ExtensionValue } from "./internal/Domain/Extensions.js";
+export {
+  EntityType,
+  MappingCardinality,
+  PredicateModifier,
+  SssomVersion,
+  EntityTypeModule_minimumVersion as minimumEntityTypeVersion,
+  EntityTypeModule_parse as parseEntityType,
+  EntityTypeModule_toLexical as entityTypeToLexical,
+  EntityTypeModule_tryParse as tryParseEntityType,
+  MappingCardinalityModule_minimumVersion as minimumMappingCardinalityVersion,
+  MappingCardinalityModule_parse as parseMappingCardinality,
+  MappingCardinalityModule_toLexical as mappingCardinalityToLexical,
+  MappingCardinalityModule_tryParse as tryParseMappingCardinality,
+  PredicateModifierModule_parse as parsePredicateModifier,
+  PredicateModifierModule_toLexical as predicateModifierToLexical,
+  PredicateModifierModule_tryParse as tryParsePredicateModifier,
+  SssomVersionModule_parse as parseSssomVersion,
+  SssomVersionModule_toLexical as sssomVersionToLexical,
+  SssomVersionModule_tryParse as tryParseSssomVersion
+} from "./internal/Domain/Enums.js";
+export {
+  PrefixEntry,
+  CurieMap_builtInEntries as builtInPrefixes,
+  CurieMap_contract as contractCurie,
+  CurieMap_expand as expandCurie,
+  CurieMap_isBuiltIn as isBuiltInPrefix,
+  CurieMap_tryContract as tryContractCurie,
+  CurieMap_tryExpand as tryExpandCurie
+} from "./internal/Domain/CurieMap.js";
+export {
+  ConditionalRequirement,
+  SlotCardinality,
+  SlotDescriptor,
+  SlotPlacement,
+  SlotRange,
+  SlotVersionDescriptor,
+  MappingDescriptors_allDescriptors as mappingDescriptors,
+  MappingDescriptors_tryFind as tryFindMappingDescriptor,
+  MappingSetDescriptors_allDescriptors as mappingSetDescriptors,
+  MappingSetDescriptors_tryFind as tryFindMappingSetDescriptor
+} from "./internal/Domain/Descriptors.js";
+export { Mapping } from "./internal/Domain/Mapping.js";
+export { MappingSet } from "./internal/Domain/MappingSet.js";
+export { SssomDocument } from "./internal/Domain/SssomDocument.js";
+"""
+
 let private packNpm () =
     let packageRoot = Path.Combine(stagingDir, "npm")
     let generatedRoot = Path.Combine(packageRoot, "internal")
     recreateUnder artifactsDir packageRoot
     transpile javaScriptSourceProject "javascript" generatedRoot
-    writeText (Path.Combine(packageRoot, "index.js")) $"export const version = \"{packageVersion.SemVer}\";\n"
+    writeText (Path.Combine(packageRoot, "index.js")) javaScriptIndex
     writeText (Path.Combine(packageRoot, "package.json")) npmManifest
     copyFile (Path.Combine(repoRoot, "README.md")) (Path.Combine(packageRoot, "README.md"))
     copyFile (Path.Combine(repoRoot, "LICENSE")) (Path.Combine(packageRoot, "LICENSE"))
@@ -176,6 +226,72 @@ Repository = "https://github.com/nfdi4plants/PolyglotSSSOM.git"
 packages = ["polyglot_sssom"]
 """
 
+let private pythonInit =
+    $$"""__version__ = "{{packageVersion.Pep440}}"
+
+from ._generated.Domain.lexical_values import EntityReference, SssomDate, UriReference
+from ._generated.Domain.extensions import ExtensionDefinition, ExtensionValue
+from ._generated.Domain.curie_map import (
+    PrefixEntry,
+    CurieMap_builtInEntries as built_in_prefixes,
+    CurieMap_contract as contract_curie,
+    CurieMap_expand as expand_curie,
+    CurieMap_isBuiltIn as is_built_in_prefix,
+    CurieMap_tryContract as try_contract_curie,
+    CurieMap_tryExpand as try_expand_curie,
+)
+from ._generated.Domain.enums import (
+    SssomVersion_V1_0,
+    SssomVersion_V1_1,
+    SssomVersionModule_parse as parse_sssom_version,
+    SssomVersionModule_toLexical as sssom_version_to_lexical,
+    SssomVersionModule_tryParse as try_parse_sssom_version,
+    EntityTypeModule_minimumVersion as minimum_entity_type_version,
+    EntityTypeModule_parse as parse_entity_type,
+    EntityTypeModule_toLexical as entity_type_to_lexical,
+    EntityTypeModule_tryParse as try_parse_entity_type,
+    MappingCardinalityModule_minimumVersion as minimum_mapping_cardinality_version,
+    MappingCardinalityModule_parse as parse_mapping_cardinality,
+    MappingCardinalityModule_toLexical as mapping_cardinality_to_lexical,
+    MappingCardinalityModule_tryParse as try_parse_mapping_cardinality,
+    PredicateModifierModule_parse as parse_predicate_modifier,
+    PredicateModifierModule_toLexical as predicate_modifier_to_lexical,
+    PredicateModifierModule_tryParse as try_parse_predicate_modifier,
+)
+from ._generated.Domain.descriptors import (
+    SlotDescriptor,
+    SlotVersionDescriptor,
+    MappingDescriptors_allDescriptors as mapping_descriptors,
+    MappingDescriptors_tryFind as try_find_mapping_descriptor,
+    MappingSetDescriptors_allDescriptors as mapping_set_descriptors,
+    MappingSetDescriptors_tryFind as try_find_mapping_set_descriptor,
+)
+from ._generated.Domain.mapping import Mapping
+from ._generated.Domain.mapping_set import MappingSet
+from ._generated.Domain.sssom_document import SssomDocument
+
+SSSOM_VERSION_1_0 = SssomVersion_V1_0.singleton
+SSSOM_VERSION_1_1 = SssomVersion_V1_1.singleton
+
+__all__ = [
+    "__version__",
+    "EntityReference", "SssomDate", "UriReference",
+    "ExtensionDefinition", "ExtensionValue", "PrefixEntry",
+    "Mapping", "MappingSet", "SssomDocument",
+    "SlotDescriptor", "SlotVersionDescriptor",
+    "SSSOM_VERSION_1_0", "SSSOM_VERSION_1_1",
+    "built_in_prefixes", "contract_curie", "expand_curie", "is_built_in_prefix",
+    "try_contract_curie", "try_expand_curie",
+    "parse_sssom_version", "sssom_version_to_lexical", "try_parse_sssom_version",
+    "minimum_entity_type_version", "parse_entity_type", "entity_type_to_lexical", "try_parse_entity_type",
+    "minimum_mapping_cardinality_version", "parse_mapping_cardinality",
+    "mapping_cardinality_to_lexical", "try_parse_mapping_cardinality",
+    "parse_predicate_modifier", "predicate_modifier_to_lexical", "try_parse_predicate_modifier",
+    "mapping_descriptors", "try_find_mapping_descriptor",
+    "mapping_set_descriptors", "try_find_mapping_set_descriptor",
+]
+"""
+
 let private packPython () =
     let packageRoot = Path.Combine(stagingDir, "python")
     let moduleRoot = Path.Combine(packageRoot, "polyglot_sssom")
@@ -188,7 +304,7 @@ let private packPython () =
         Directory.EnumerateFiles(generatedRoot, pattern, SearchOption.AllDirectories)
         |> Seq.iter File.Delete
 
-    writeText (Path.Combine(moduleRoot, "__init__.py")) $"__version__ = \"{packageVersion.Pep440}\"\n"
+    writeText (Path.Combine(moduleRoot, "__init__.py")) pythonInit
     writeText (Path.Combine(packageRoot, "pyproject.toml")) pythonManifest
     copyFile (Path.Combine(repoRoot, "README.md")) (Path.Combine(packageRoot, "README.md"))
     copyFile (Path.Combine(repoRoot, "LICENSE")) (Path.Combine(packageRoot, "LICENSE"))
@@ -252,13 +368,12 @@ open SSSOM
 
 [<EntryPoint>]
 let main _ =
-    let input =
-        "#mapping_set_id: https://example.org/mappings\n" +
-        "predicate_id\tmapping_justification\tsubject_id\tobject_id\n" +
-        "skos:exactMatch\tsemapv:ManualMappingCuration\texample:subject\texample:object\n"
-
-    let document = DecodeSssomDocument.DecodeSssomDocument(input)
-    if List.length document.Mappings <> 1 then failwith "Expected one decoded mapping"
+    let mapping = Mapping(EntityReference.Create "skos:exactMatch", EntityReference.Create "semapv:ManualMappingCuration")
+    mapping.DerivedFrom <- [| EntityReference.Create "mapping:source" |]
+    let metadata = MappingSet(UriReference.Create "https://example.org/mappings", UriReference.Create "https://example.org/license")
+    let document = SssomDocument(metadata, [| mapping |])
+    if document.Mappings.Length <> 1 then failwith "Expected one mapping"
+    if document.Mappings.[0].DerivedFrom.Length <> 1 then failwith "Expected one derived_from value"
     printfn "PolyglotSSSOM package smoke OK"
     0
 """
@@ -303,13 +418,18 @@ let private smokeNpm npmPackage =
 
     writeText
         (Path.Combine(directory, "smoke.mjs"))
-        $"""import {{ version }} from '@nfdi4plants/polyglot-sssom';
+        $"""import {{ EntityReference, Mapping, MappingSet, SssomDocument, UriReference, expandCurie, mappingDescriptors, version }} from '@nfdi4plants/polyglot-sssom';
 if (version !== '{packageVersion.SemVer}') throw new Error(`Unexpected version ${{version}}`);
-const packageRoot = new URL('./node_modules/@nfdi4plants/polyglot-sssom/', import.meta.url);
-const {{ DecodeSssomDocument }} = await import(new URL('internal/Parser/DecodeSssomDocument.js', packageRoot));
-const {{ length }} = await import(new URL('internal/fable_modules/fable-library-js.5.13.0/List.js', packageRoot));
-const input = '#mapping_set_id: https://example.org/mappings\npredicate_id\tmapping_justification\tsubject_id\tobject_id\nskos:exactMatch\tsemapv:ManualMappingCuration\texample:subject\texample:object\n';
-if (length(DecodeSssomDocument.DecodeSssomDocument(input).Mappings) !== 1) throw new Error('Generated JavaScript smoke failed');
+const mapping = new Mapping(EntityReference.Create('skos:exactMatch'), EntityReference.Create('semapv:ManualMappingCuration'));
+mapping.DerivedFrom = [EntityReference.Create('mapping:source')];
+const metadata = new MappingSet(UriReference.Create('https://example.org/mappings'), UriReference.Create('https://example.org/license'));
+const document = new SssomDocument(metadata, [mapping]);
+if (document.Mappings.length !== 1 || document.Mappings[0].DerivedFrom.length !== 1) throw new Error('JavaScript model smoke failed');
+if (mappingDescriptors().length !== 51) throw new Error('JavaScript descriptors smoke failed');
+if (expandCurie([], 'skos:exactMatch') !== 'http://www.w3.org/2004/02/skos/core#exactMatch') throw new Error('JavaScript CURIE smoke failed');
+let rejectedInvalidReference = false;
+try {{ new EntityReference('not-an-identifier'); }} catch {{ rejectedInvalidReference = true; }}
+if (!rejectedInvalidReference) throw new Error('JavaScript lexical constructor bypassed validation');
 console.log('npm smoke OK');
 """
 
@@ -322,13 +442,24 @@ let private smokePython pythonPackage =
 
     writeText
         (Path.Combine(directory, "smoke.py"))
-        $"""import polyglot_sssom
-from fable_library.list import length
-from polyglot_sssom._generated.Parser.decode_sssom_document import DecodeSssomDocument
+        $"""import polyglot_sssom as sssom
 
-assert polyglot_sssom.__version__ == '{packageVersion.Pep440}'
-input = '#mapping_set_id: https://example.org/mappings\npredicate_id\tmapping_justification\tsubject_id\tobject_id\nskos:exactMatch\tsemapv:ManualMappingCuration\texample:subject\texample:object\n'
-assert length(DecodeSssomDocument.DecodeSssomDocument(input).Mappings) == 1
+assert sssom.__version__ == '{packageVersion.Pep440}'
+mapping = sssom.Mapping(sssom.EntityReference.Create('skos:exactMatch'), sssom.EntityReference.Create('semapv:ManualMappingCuration'))
+mapping.DerivedFrom = [sssom.EntityReference.Create('mapping:source')]
+metadata = sssom.MappingSet(sssom.UriReference.Create('https://example.org/mappings'), sssom.UriReference.Create('https://example.org/license'))
+document = sssom.SssomDocument(metadata, [mapping])
+assert len(document.Mappings) == 1 and len(document.Mappings[0].DerivedFrom) == 1
+assert len(sssom.mapping_descriptors()) == 51
+assert sssom.expand_curie([], 'skos:exactMatch') == 'http://www.w3.org/2004/02/skos/core#exactMatch'
+try:
+    sssom.EntityReference('not-an-identifier')
+    raise AssertionError('Python lexical constructor bypassed validation')
+except ValueError:
+    pass
+except Exception as error:
+    if 'not a valid URI or CURIE' not in str(error):
+        raise
 print('Python smoke OK')
 """
 
