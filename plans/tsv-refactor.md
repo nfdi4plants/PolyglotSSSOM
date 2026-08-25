@@ -1,11 +1,11 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Phase 1 implementation authorized on 2026-08-25; later phases remain planning snapshots.**
+> **Status: Build/package foundation and specification bundle implemented; domain and codec phases remain planning snapshots.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
-> foundation on 2026-08-25. That authorization does not extend to package
-> publication, the domain/codec refactor, specification completion, or
-> downstream BioFSharp work.
+> foundation and subsequent specification bundle work on 2026-08-25. That
+> authorization does not extend to package publication, the domain/codec
+> refactor, or downstream BioFSharp work.
 
 ## Summary
 
@@ -20,6 +20,7 @@
   - v1.1 draft at the pinned commit above.
   - Include `LICENSE`, `spec-intro.md`, `spec-model.md`, `spec-formats-tsv.md`, and `sssom_schema.yaml`.
   - Record source URLs, commits, SHA-256 checksums, licensing, and the manual update procedure in `spec/UPSTREAM.md`.
+  - The complete byte-preserved snapshots live in `spec/sssom-v1.0.0` and `spec/sssom-v1.1-draft`; `.gitattributes` disables line-ending conversion for both.
 - Decode versionless documents as v1.0. Reject unsupported future versions and contradictions such as declared v1.0 metadata using v1.1-only features.
 - Canonical encoding selects the lowest required version:
   - Omit `sssom_version` for pure v1.0 documents.

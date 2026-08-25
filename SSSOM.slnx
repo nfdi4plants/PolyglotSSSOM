@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/project/">
     <File Path=".config/dotnet-tools.json" />
+    <File Path=".gitattributes" />
     <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
     <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="README.md" />
@@ -16,6 +18,9 @@
     <Project Path="src/SSSOM/SSSOM.JavaScript.fsproj" />
     <Project Path="src/SSSOM/SSSOM.Python.fsproj" />
     <Project Path="src/SSSOM/SSSOM.fsproj" />
+  </Folder>
+  <Folder Name="/spec/">
+    <File Path="spec/UPSTREAM.md" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SSSOM.Tests/SSSOM.JavaScript.Tests.fsproj" />

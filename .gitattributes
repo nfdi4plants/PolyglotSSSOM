@@ -1,0 +1,2 @@
+# Vendored upstream specification snapshots must remain byte-identical.
+/spec/sssom-v*/** -text

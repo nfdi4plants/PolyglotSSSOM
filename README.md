@@ -6,6 +6,8 @@ It is written once in F# and built for .NET, JavaScript, and Python.
 
 The current `0.1.0-alpha.1` line is an implementation prerelease. Its domain and
 codec API will change while the SSSOM v1.0/v1.1 refactor is completed.
+The exact stable-v1.0 and pinned-v1.1 specification sources are documented in
+[`spec/UPSTREAM.md`](spec/UPSTREAM.md).
 
 ## Requirements
 
