@@ -1,11 +1,12 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Build/package foundation, specification bundle, and portable domain model implemented; codec phase remains a planning snapshot.**
+> **Status: Specification bundle, build/package foundation, portable domain model, and TSV/YAML codec implemented and package-smoke tested.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
 > foundation, specification bundle, and subsequent portable-domain-model work
-> on 2026-08-25. That authorization does not extend to package publication, the
-> TSV/YAML codec refactor, or downstream BioFSharp work.
+> on 2026-08-25, then authorized the TSV/YAML codec implementation on
+> 2026-08-26. Package publication and downstream BioFSharp work remain outside
+> that authorization.
 
 ## Summary
 
@@ -57,6 +58,11 @@ than retained as a conflicting, unsupported implementation.
 - Support declared extension definitions and lexical extension values on both mapping sets and mappings. Validate type hints; warn and discard undeclared extensions.
 
 ### 3. TSV/YAML codecs and validation
+
+Implemented on 2026-08-26. The same behavioral suite runs on .NET, Node, and
+Python, including byte-identical canonical golden output. Packed NuGet, npm,
+and Python artifacts also pass native codec consumer smokes. Publication is
+still a separate human-authorized operation.
 
 - Implement YAML codecs with YAMLicious using its syntax-tree to strict structural/type layer to typed decoder/canonical encoder pattern.
 - Expose one static facade:

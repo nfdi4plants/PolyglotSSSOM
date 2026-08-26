@@ -188,6 +188,14 @@ export {
 export { Mapping } from "./internal/Domain/Mapping.js";
 export { MappingSet } from "./internal/Domain/MappingSet.js";
 export { SssomDocument } from "./internal/Domain/SssomDocument.js";
+export {
+  DecodeResult,
+  DiagnosticSeverity,
+  EncodeResult,
+  SssomCodecException,
+  SssomDiagnostic
+} from "./internal/Codec/Diagnostics.js";
+export { SssomCodec } from "./internal/Codec/SssomCodec.js";
 """
 
 let private packNpm () =
@@ -269,15 +277,28 @@ from ._generated.Domain.descriptors import (
 from ._generated.Domain.mapping import Mapping
 from ._generated.Domain.mapping_set import MappingSet
 from ._generated.Domain.sssom_document import SssomDocument
+from ._generated.Codec.diagnostics import (
+    DecodeResult,
+    DiagnosticSeverity_Error,
+    DiagnosticSeverity_Warning,
+    EncodeResult,
+    SssomCodecException,
+    SssomDiagnostic,
+)
+from ._generated.Codec.sssom_codec import SssomCodec
 
 SSSOM_VERSION_1_0 = SssomVersion_V1_0.singleton
 SSSOM_VERSION_1_1 = SssomVersion_V1_1.singleton
+DIAGNOSTIC_ERROR = DiagnosticSeverity_Error.singleton
+DIAGNOSTIC_WARNING = DiagnosticSeverity_Warning.singleton
 
 __all__ = [
     "__version__",
     "EntityReference", "SssomDate", "UriReference",
     "ExtensionDefinition", "ExtensionValue", "PrefixEntry",
     "Mapping", "MappingSet", "SssomDocument",
+    "DecodeResult", "EncodeResult", "SssomCodec", "SssomCodecException", "SssomDiagnostic",
+    "DIAGNOSTIC_ERROR", "DIAGNOSTIC_WARNING",
     "SlotDescriptor", "SlotVersionDescriptor",
     "SSSOM_VERSION_1_0", "SSSOM_VERSION_1_1",
     "built_in_prefixes", "contract_curie", "expand_curie", "is_built_in_prefix",
@@ -368,12 +389,10 @@ open SSSOM
 
 [<EntryPoint>]
 let main _ =
-    let mapping = Mapping(EntityReference.Create "skos:exactMatch", EntityReference.Create "semapv:ManualMappingCuration")
-    mapping.DerivedFrom <- [| EntityReference.Create "mapping:source" |]
-    let metadata = MappingSet(UriReference.Create "https://example.org/mappings", UriReference.Create "https://example.org/license")
-    let document = SssomDocument(metadata, [| mapping |])
+    let source = "#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n"
+    let document = SssomCodec.DecodeEmbedded source
     if document.Mappings.Length <> 1 then failwith "Expected one mapping"
-    if document.Mappings.[0].DerivedFrom.Length <> 1 then failwith "Expected one derived_from value"
+    if SssomCodec.EncodeCanonical(document) <> source then failwith "Expected a stable canonical round trip"
     printfn "PolyglotSSSOM package smoke OK"
     0
 """
@@ -418,7 +437,7 @@ let private smokeNpm npmPackage =
 
     writeText
         (Path.Combine(directory, "smoke.mjs"))
-        $"""import {{ EntityReference, Mapping, MappingSet, SssomDocument, UriReference, expandCurie, mappingDescriptors, version }} from '@nfdi4plants/polyglot-sssom';
+        $"""import {{ EntityReference, Mapping, MappingSet, SssomCodec, SssomDocument, UriReference, expandCurie, mappingDescriptors, version }} from '@nfdi4plants/polyglot-sssom';
 if (version !== '{packageVersion.SemVer}') throw new Error(`Unexpected version ${{version}}`);
 const mapping = new Mapping(EntityReference.Create('skos:exactMatch'), EntityReference.Create('semapv:ManualMappingCuration'));
 mapping.DerivedFrom = [EntityReference.Create('mapping:source')];
@@ -427,6 +446,9 @@ const document = new SssomDocument(metadata, [mapping]);
 if (document.Mappings.length !== 1 || document.Mappings[0].DerivedFrom.length !== 1) throw new Error('JavaScript model smoke failed');
 if (mappingDescriptors().length !== 51) throw new Error('JavaScript descriptors smoke failed');
 if (expandCurie([], 'skos:exactMatch') !== 'http://www.w3.org/2004/02/skos/core#exactMatch') throw new Error('JavaScript CURIE smoke failed');
+const source = '#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n';
+const decoded = SssomCodec.TryDecodeEmbedded(source);
+if (!decoded.IsSuccess || SssomCodec.EncodeCanonical(decoded.Document) !== source) throw new Error('JavaScript codec smoke failed');
 let rejectedInvalidReference = false;
 try {{ new EntityReference('not-an-identifier'); }} catch {{ rejectedInvalidReference = true; }}
 if (!rejectedInvalidReference) throw new Error('JavaScript lexical constructor bypassed validation');
@@ -452,6 +474,9 @@ document = sssom.SssomDocument(metadata, [mapping])
 assert len(document.Mappings) == 1 and len(document.Mappings[0].DerivedFrom) == 1
 assert len(sssom.mapping_descriptors()) == 51
 assert sssom.expand_curie([], 'skos:exactMatch') == 'http://www.w3.org/2004/02/skos/core#exactMatch'
+source = '#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n'
+decoded = sssom.SssomCodec.TryDecodeEmbedded(source)
+assert decoded.IsSuccess and sssom.SssomCodec.EncodeCanonical(decoded.Document) == source
 try:
     sssom.EntityReference('not-an-identifier')
     raise AssertionError('Python lexical constructor bypassed validation')

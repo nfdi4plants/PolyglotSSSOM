@@ -5,8 +5,8 @@ PolyglotSSSOM is a cross-runtime YAML-metadata-plus-TSV implementation of the
 It is written once in F# and built for .NET, JavaScript, and Python.
 
 The current `0.1.0-alpha.1` line is an implementation prerelease. Its portable
-domain model is available, while the replacement TSV/YAML codec is still under
-development and is not exposed yet.
+domain model and strict, version-aware TSV/YAML codec are available across all
+three target runtimes.
 The exact stable-v1.0 and pinned-v1.1 specification sources are documented in
 [`spec/UPSTREAM.md`](spec/UPSTREAM.md).
 
@@ -40,6 +40,7 @@ Generated output is written below `artifacts/` and is never committed.
 - PyPI: `polyglot-sssom` (`import polyglot_sssom`)
 
 All three packages expose the portable mapping-set, mapping, lexical-value,
-extension, descriptor, and CURIE APIs. Optional scalars remain absent and
-multivalued slots use empty arrays for zero values. The old proof-of-concept
-decoder and encoder have been removed pending the version-aware codec phase.
+extension, descriptor, CURIE, diagnostic, and `SssomCodec` APIs. Optional
+scalars remain absent and multivalued slots use empty arrays for zero values.
+The codec reads embedded or external metadata, validates v1.0 and the pinned
+v1.1 draft, and writes deterministic canonical embedded SSSOM/TSV.

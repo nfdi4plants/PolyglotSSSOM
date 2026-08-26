@@ -26,6 +26,13 @@
     <Compile Include="Domain\Mapping.fs" />
     <Compile Include="Domain\MappingSet.fs" />
     <Compile Include="Domain\SssomDocument.fs" />
+    <Compile Include="Codec\Diagnostics.fs" />
+    <Compile Include="Codec\Tsv.fs" />
+    <Compile Include="Codec\ModelAccess.fs" />
+    <Compile Include="Codec\Validation.fs" />
+    <Compile Include="Codec\Decode.fs" />
+    <Compile Include="Codec\Encode.fs" />
+    <Compile Include="Codec\SssomCodec.fs" />
   </ItemGroup>
 
   <ItemGroup>
