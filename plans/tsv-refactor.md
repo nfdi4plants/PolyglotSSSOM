@@ -1,12 +1,13 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Specification bundle, build/package foundation, portable domain model, and TSV/YAML codec implemented and package-smoke tested.**
+> **Status: Specification bundle, build/package foundation, portable domain model, and TSV/YAML codec implemented and package-smoke tested. IR-ready authoring ergonomics is the next planned phase.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
 > foundation, specification bundle, and subsequent portable-domain-model work
 > on 2026-08-25, then authorized the TSV/YAML codec implementation on
-> 2026-08-26. Package publication and downstream BioFSharp work remain outside
-> that authorization.
+> 2026-08-26. The authoring-ergonomics direction was added on 2026-08-26 but is
+> not yet implemented. Package publication and downstream BioFSharp work remain
+> outside that authorization.
 
 ## Summary
 
@@ -77,12 +78,31 @@ still a separate human-authorized operation.
 - Canonical encoding must not mutate the caller. Apply specification propagation/condensation, descriptor-defined metadata and column order, deterministic CURIE/extension ordering, ordinal full-row sorting, invariant number/date formatting, and LF line endings.
 - Read embedded or separate metadata, but emit canonical embedded metadata only.
 
+### 4. IR-ready authoring ergonomics
+
+Planned on 2026-08-26. Keep the complete low-level constructors and mutable
+properties, but add a compact cross-runtime path for ordinary mapping-set
+authoring and later ArcIR integration.
+
+- Add lexical-string factories for an empty mapping set/document, ordinary entity-to-entity mappings, and `sssom:NoTermFound` mappings. Factories validate and construct the existing lexical wrapper types internally; they do not introduce defaults for predicates, justifications, confidence, or provenance.
+- Add deep `Clone` operations for mappings, mapping sets, and documents. Clones isolate every mutable mapping, metadata object, array, prefix entry, extension definition, and extension value so an imported document can remain untouched while a canonical working copy is edited.
+- Add an idempotent prefix helper: an identical prefix definition is a no-op, while reusing a prefix name with a different expansion is rejected.
+- Add explicit document editing operations:
+  - `AddMapping(mapping)` is format-general and preserves the mapping's optional `RecordId`; it never invents an identifier.
+  - `AddMappingWithRecordId(recordId, mapping)` validates and assigns the caller-supplied native v1.1 record ID, rejects collisions, promotes an explicitly v1.0 working document to v1.1, and appends the mapping atomically.
+  - Find, replace, and remove mappings by `record_id`. Replacement retains the selected record ID; changing identity requires an explicit remove followed by an add.
+- Editing operations enforce local invariants such as non-null arguments, valid lexical values, prefix conflicts, and duplicate record IDs. Whole-document SSSOM conformance remains explicit through `Validate` and canonical encoding so callers can construct documents incrementally.
+- Document the construction, clone/edit, validation, and encoding workflows in F#, JavaScript, and Python. Exercise the same surface in the playground and native package-consumer smokes.
+- Do not add fluent builders or TypeScript declarations in this phase. Keep mapping selection, ambiguity policy, provenance binding, and record-ID allocation outside PolyglotSSSOM.
+- The future ArcIR integration may standardize its canonical mapping artifacts on v1.1 and must supply the record IDs it chooses when calling `AddMappingWithRecordId`; PolyglotSSSOM only validates, retains, and serializes those IDs.
+
 ## Test and Acceptance Plan
 
 - Run the same Fable.Pyxpecto behavioral suite on .NET, Node, and Python.
 - Add offline v1.0 and pinned-v1.1 fixtures covering embedded/external metadata, version inference, version conflicts, propagation, extensions, CURIE maps, literal mappings, `NoTermFound`, `0:0`, `record_id`, `derived_from`, and pipe/backslash escaping.
 - Add golden tests proving byte-identical canonical output across all runtimes and semantic decode-encode-decode round trips.
 - Add exhaustive descriptor-coverage and property-isolation tests so every slot is represented once and every setter changes only its own backing field.
+- Add shared factory/editing tests for clone isolation, prefix conflicts, append order, record-ID collision handling, v1.1 promotion, record lookup/replacement/removal, and an edited canonical round trip that leaves the imported document unchanged.
 - Lock regressions for the existing object-source backing-field bug, entity-type decoding bug, curation header typo, extension-definition encoder condition, scalar/multivalue mistakes, and broken generated JavaScript imports.
 - Pack artifacts and run native consumer smoke tests from F#/.NET, Node ESM, and Python, using only the packed packages.
 - The refactor is complete when all three runtime suites, canonical golden comparisons, package-content checks, and native smoke tests pass through the FAKE build.

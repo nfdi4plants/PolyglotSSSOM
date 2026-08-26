@@ -1,0 +1,7 @@
+#curie_map:
+#  ex: https://example.org/
+#mapping_set_id: https://example.org/set
+#license: https://example.org/license
+#mapping_tool: mapper
+subject_id	predicate_id	object_id	mapping_justification	confidence
+ex:b	skos:exactMatch	ex:c	semapv:ManualMappingCuration	0.956

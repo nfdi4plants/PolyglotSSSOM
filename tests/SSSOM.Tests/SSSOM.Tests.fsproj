@@ -8,8 +8,13 @@
 
   <ItemGroup>
     <Compile Include="DomainTests.fs" />
+    <Compile Include="CanonicalFixture.fs" />
     <Compile Include="CodecTests.fs" />
     <Compile Include="Main.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\fixtures\canonical-example.sssom.tsv" LogicalName="SSSOM.Tests.fixtures.canonical-example.sssom.tsv" />
   </ItemGroup>
 
   <ItemGroup>

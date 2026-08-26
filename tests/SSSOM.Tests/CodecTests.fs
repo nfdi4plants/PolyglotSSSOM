@@ -24,15 +24,6 @@ let private v1_0Embedded =
     + "subject_id\tpredicate_id\tobject_id\tmapping_justification\tconfidence\n"
     + "ex:b\tskos:exactMatch\tex:c\tsemapv:ManualMappingCuration\t0.9555\n"
 
-let private v1_0Canonical =
-    "#curie_map:\n"
-    + "#  ex: https://example.org/\n"
-    + "#mapping_set_id: https://example.org/set\n"
-    + "#license: https://example.org/license\n"
-    + "#mapping_tool: mapper\n"
-    + "subject_id\tpredicate_id\tobject_id\tmapping_justification\tconfidence\n"
-    + "ex:b\tskos:exactMatch\tex:c\tsemapv:ManualMappingCuration\t0.956\n"
-
 let private decodeTests =
     testList "Decoding" [
         testCase "embedded v1.0 metadata and mappings decode with propagation" <| fun _ ->
@@ -91,7 +82,7 @@ let private canonicalTests =
     testList "Canonical encoding" [
         testCase "v1.0 output is deterministic and rounds numbers to three decimals" <| fun _ ->
             let document = SssomCodec.DecodeEmbedded v1_0Embedded
-            Expect.equal (SssomCodec.EncodeCanonical document) v1_0Canonical "canonical golden output"
+            Expect.equal (SssomCodec.EncodeCanonical document) (CanonicalFixture.content ()) "canonical golden output"
 
         testCase "encoding condenses common values without mutating mappings" <| fun _ ->
             let metadata =
@@ -134,10 +125,12 @@ let private canonicalTests =
             Expect.isTrue (encoded.StartsWith("#sssom_version: 1.1\n")) "version marker"
             Expect.stringContains encoded "left\\|right" "literal pipe escaping"
 
-        testCase "canonical output is stable over decode encode decode" <| fun _ ->
-            let first = SssomCodec.DecodeEmbedded v1_0Embedded |> SssomCodec.EncodeCanonical
+        testCase "embedded canonical fixture round trips byte-for-byte" <| fun _ ->
+            let canonical = CanonicalFixture.content ()
+            let first = SssomCodec.DecodeEmbedded canonical |> SssomCodec.EncodeCanonical
             let second = SssomCodec.DecodeEmbedded first |> SssomCodec.EncodeCanonical
-            Expect.equal second first "semantic round trip"
+            Expect.equal first canonical "first canonical round trip"
+            Expect.equal second canonical "second canonical round trip"
     ]
 
 let private extensionTests =

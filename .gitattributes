@@ -1,2 +1,5 @@
 # Vendored upstream specification snapshots must remain byte-identical.
 /spec/sssom-v*/** -text
+
+# Canonical golden files are compared byte-for-byte on every runtime.
+/tests/fixtures/*.sssom.tsv text eol=lf
