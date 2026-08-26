@@ -85,7 +85,12 @@ module internal Encoder =
 
     let private yamlPlain (value: string) =
         let style =
-            if value.Contains("\n") || value.Contains("\r") || value.Contains("\t") || value.Contains(": ") || value.Contains(" #") then
+            if value.Contains("\n")
+               || value.Contains("\r")
+               || value.Contains("\t")
+               || value.Contains(": ")
+               || value.Contains(" #")
+               || value.EndsWith(":") then
                 ScalarStyle.DoubleQuoted
             else
                 ScalarStyle.Plain

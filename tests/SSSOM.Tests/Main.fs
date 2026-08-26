@@ -6,6 +6,7 @@ let allTests =
     testList "All SSSOM Tests" [
         SSSOM.Tests.DomainTests.tests
         SSSOM.Tests.CodecTests.tests
+        SSSOM.Tests.AuthoringTests.tests
     ]
 
 #if !FABLE_COMPILER_JAVASCRIPT && !FABLE_COMPILER_TYPESCRIPT

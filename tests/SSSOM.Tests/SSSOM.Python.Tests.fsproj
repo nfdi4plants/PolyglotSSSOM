@@ -11,6 +11,7 @@
     <Compile Include="DomainTests.fs" />
     <Compile Include="CanonicalFixture.fs" />
     <Compile Include="CodecTests.fs" />
+    <Compile Include="AuthoringTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 

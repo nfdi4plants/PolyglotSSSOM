@@ -44,3 +44,79 @@ extension, descriptor, CURIE, diagnostic, and `SssomCodec` APIs. Optional
 scalars remain absent and multivalued slots use empty arrays for zero values.
 The codec reads embedded or external metadata, validates v1.0 and the pinned
 v1.1 draft, and writes deterministic canonical embedded SSSOM/TSV.
+
+## Authoring mappings
+
+The lexical factories cover the common entity-to-entity path without exposing
+the complete positional constructors. `AddMapping` preserves an optional
+record ID for general v1.0/v1.1 authoring. `AddMappingWithRecordId` assigns a
+caller-owned native v1.1 ID atomically; PolyglotSSSOM never invents one.
+
+F#:
+
+```fsharp
+let document =
+    SssomDocument.Create(
+        "https://example.org/mappings",
+        "https://example.org/license"
+    )
+
+document.Metadata.EnsurePrefix("ex", "https://example.org/")
+document.Metadata.EnsurePrefix("uuid", "urn:uuid:")
+
+let mapping =
+    Mapping.CreateEntityMapping(
+        "ex:source",
+        "skos:exactMatch",
+        "ex:target",
+        "semapv:ManualMappingCuration"
+    )
+
+document.AddMappingWithRecordId("urn:uuid:example", mapping)
+let content = SssomCodec.EncodeCanonical document
+```
+
+JavaScript:
+
+```javascript
+const document = SssomDocument.Create(
+  "https://example.org/mappings",
+  "https://example.org/license"
+);
+document.Metadata.EnsurePrefix("ex", "https://example.org/");
+document.Metadata.EnsurePrefix("uuid", "urn:uuid:");
+
+const mapping = Mapping.CreateEntityMapping(
+  "ex:source",
+  "skos:exactMatch",
+  "ex:target",
+  "semapv:ManualMappingCuration"
+);
+document.AddMappingWithRecordId("urn:uuid:example", mapping);
+const content = SssomCodec.EncodeCanonical(document);
+```
+
+Python:
+
+```python
+document = sssom.SssomDocument.Create(
+    "https://example.org/mappings",
+    "https://example.org/license",
+)
+document.Metadata.EnsurePrefix("ex", "https://example.org/")
+document.Metadata.EnsurePrefix("uuid", "urn:uuid:")
+
+mapping = sssom.Mapping.CreateEntityMapping(
+    "ex:source",
+    "skos:exactMatch",
+    "ex:target",
+    "semapv:ManualMappingCuration",
+)
+document.AddMappingWithRecordId("urn:uuid:example", mapping)
+content = sssom.SssomCodec.EncodeCanonical(document)
+```
+
+Call `Clone()` before editing when the imported document must remain available
+unchanged for its original round trip. Find, replace, and remove operations use
+the stable `record_id`; full document correctness remains explicit through
+`SssomCodec.Validate` or canonical encoding.

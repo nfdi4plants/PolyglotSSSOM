@@ -1,13 +1,13 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Specification bundle, build/package foundation, portable domain model, and TSV/YAML codec implemented and package-smoke tested. IR-ready authoring ergonomics is the next planned phase.**
+> **Status: Specification bundle, build/package foundation, portable domain model, TSV/YAML codec, and IR-ready authoring ergonomics implemented and package-smoke tested.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
 > foundation, specification bundle, and subsequent portable-domain-model work
 > on 2026-08-25, then authorized the TSV/YAML codec implementation on
-> 2026-08-26. The authoring-ergonomics direction was added on 2026-08-26 but is
-> not yet implemented. Package publication and downstream BioFSharp work remain
-> outside that authorization.
+> 2026-08-26, followed by the authoring-ergonomics phase on the same date.
+> Package publication and downstream BioFSharp work remain outside that
+> authorization.
 
 ## Summary
 
@@ -80,9 +80,10 @@ still a separate human-authorized operation.
 
 ### 4. IR-ready authoring ergonomics
 
-Planned on 2026-08-26. Keep the complete low-level constructors and mutable
-properties, but add a compact cross-runtime path for ordinary mapping-set
-authoring and later ArcIR integration.
+Implemented on 2026-08-26. The shared behavioral suite and native packed
+consumers exercise the compact cross-runtime path for ordinary mapping-set
+authoring and later ArcIR integration. The complete low-level constructors and
+mutable properties remain available.
 
 - Add lexical-string factories for an empty mapping set/document, ordinary entity-to-entity mappings, and `sssom:NoTermFound` mappings. Factories validate and construct the existing lexical wrapper types internally; they do not introduce defaults for predicates, justifications, confidence, or provenance.
 - Add deep `Clone` operations for mappings, mapping sets, and documents. Clones isolate every mutable mapping, metadata object, array, prefix entry, extension definition, and extension value so an imported document can remain untouched while a canonical working copy is edited.

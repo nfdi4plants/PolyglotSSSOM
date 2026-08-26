@@ -83,6 +83,10 @@ type MappingSet(
     let mutable extensionDefinitions = ModelValue.arrayOrEmpty extensionDefinitions
     let mutable extensionValues = ModelValue.arrayOrEmpty extensionValues
 
+    /// Creates minimal mapping-set metadata from lexical URI values.
+    static member Create(mappingSetId: string, license: string) =
+        MappingSet(UriReference.Create mappingSetId, UriReference.Create license)
+
     /// Gets or sets the required mapping-set identifier.
     member _.MappingSetId
         with get () = mappingSetId
@@ -213,3 +217,81 @@ type MappingSet(
     member _.ExtensionValues
         with get () = extensionValues
         and set value = extensionValues <- ModelValue.nonNullArray value
+
+    /// Ensures that a prefix has the requested non-relative expansion.
+    member _.EnsurePrefix(prefixName: string, prefixUrl: string) =
+        let candidate = PrefixEntry(prefixName, UriReference.Create prefixUrl)
+
+        if not candidate.PrefixUrl.IsNonRelative then
+            invalidArg (nameof prefixUrl) $"Prefix expansion '{prefixUrl}' must be a non-relative URI."
+
+        match
+            curieMap
+            |> Array.filter (fun entry -> not (isNull (box entry)))
+            |> Array.tryFind (fun entry -> entry.PrefixName = candidate.PrefixName)
+        with
+        | Some existing when existing.PrefixUrl.Value = candidate.PrefixUrl.Value -> ()
+        | Some existing ->
+            invalidArg
+                (nameof prefixName)
+                $"Prefix '{prefixName}' already expands to '{existing.PrefixUrl.Value}'."
+        | None when CurieMap.isBuiltIn candidate.PrefixName ->
+            let builtIn =
+                CurieMap.builtInEntries ()
+                |> Array.find (fun entry -> entry.PrefixName = candidate.PrefixName)
+
+            if builtIn.PrefixUrl.Value <> candidate.PrefixUrl.Value then
+                invalidArg
+                    (nameof prefixName)
+                    $"Built-in prefix '{prefixName}' must expand to '{builtIn.PrefixUrl.Value}'."
+        | None -> curieMap <- Array.append curieMap [| candidate |]
+
+    /// Creates an independent copy of this mapping set and all mutable collections, prefixes, and extensions.
+    member _.Clone() =
+        MappingSet(
+            mappingSetId,
+            license,
+            ?sssomVersion = sssomVersion,
+            curieMap = (curieMap |> Array.map (fun entry -> PrefixEntry(entry.PrefixName, entry.PrefixUrl))),
+            ?mappingSetVersion = mappingSetVersion,
+            mappingSetSource = Array.copy mappingSetSource,
+            ?mappingSetTitle = mappingSetTitle,
+            ?mappingSetDescription = mappingSetDescription,
+            ?mappingSetConfidence = mappingSetConfidence,
+            creatorId = Array.copy creatorId,
+            creatorLabel = Array.copy creatorLabel,
+            ?subjectType = subjectType,
+            ?subjectSource = subjectSource,
+            ?subjectSourceVersion = subjectSourceVersion,
+            ?objectType = objectType,
+            ?objectSource = objectSource,
+            ?objectSourceVersion = objectSourceVersion,
+            ?predicateType = predicateType,
+            ?mappingProvider = mappingProvider,
+            cardinalityScope = Array.copy cardinalityScope,
+            ?mappingTool = mappingTool,
+            ?mappingToolId = mappingToolId,
+            ?mappingToolVersion = mappingToolVersion,
+            ?mappingDate = mappingDate,
+            ?publicationDate = publicationDate,
+            subjectMatchField = Array.copy subjectMatchField,
+            objectMatchField = Array.copy objectMatchField,
+            subjectPreprocessing = Array.copy subjectPreprocessing,
+            objectPreprocessing = Array.copy objectPreprocessing,
+            ?similarityMeasure = similarityMeasure,
+            curationRule = Array.copy curationRule,
+            curationRuleText = Array.copy curationRuleText,
+            seeAlso = Array.copy seeAlso,
+            ?issueTracker = issueTracker,
+            ?other = other,
+            ?comment = comment,
+            extensionDefinitions =
+                (extensionDefinitions
+                 |> Array.map (fun definition ->
+                     ExtensionDefinition(
+                         definition.SlotName,
+                         ?property = definition.Property,
+                         ?typeHint = definition.TypeHint
+                     ))),
+            extensionValues = (extensionValues |> Array.map (fun value -> ExtensionValue(value.SlotName, value.Value)))
+        )

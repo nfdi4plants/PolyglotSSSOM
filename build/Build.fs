@@ -389,6 +389,17 @@ open SSSOM
 
 [<EntryPoint>]
 let main _ =
+    let authored = SssomDocument.Create("https://example.org/authored", "https://example.org/license")
+    authored.Metadata.EnsurePrefix("uuid", "urn:uuid:")
+    let mapping = Mapping.CreateEntityMapping("skos:Concept", "skos:exactMatch", "skos:Collection", "semapv:ManualMappingCuration")
+    authored.AddMappingWithRecordId("urn:uuid:smoke", mapping)
+    let clone = authored.Clone()
+    clone.Mappings.[0].Comment <- Some "clone only"
+    if authored.Mappings.[0].Comment.IsSome then failwith "Expected an isolated clone"
+    if authored.TryFindMappingByRecordId("urn:uuid:smoke") |> Option.isNone then failwith "Expected record lookup"
+    let authoredContent = SssomCodec.EncodeCanonical authored
+    if not (SssomCodec.DecodeEmbedded(authoredContent).Mappings.[0].RecordId.IsSome) then failwith "Expected authored record ID"
+
     let source = "#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n"
     let document = SssomCodec.DecodeEmbedded source
     if document.Mappings.Length <> 1 then failwith "Expected one mapping"
@@ -437,13 +448,18 @@ let private smokeNpm npmPackage =
 
     writeText
         (Path.Combine(directory, "smoke.mjs"))
-        $"""import {{ EntityReference, Mapping, MappingSet, SssomCodec, SssomDocument, UriReference, expandCurie, mappingDescriptors, version }} from '@nfdi4plants/polyglot-sssom';
+        $"""import {{ EntityReference, Mapping, SssomCodec, SssomDocument, expandCurie, mappingDescriptors, version }} from '@nfdi4plants/polyglot-sssom';
 if (version !== '{packageVersion.SemVer}') throw new Error(`Unexpected version ${{version}}`);
-const mapping = new Mapping(EntityReference.Create('skos:exactMatch'), EntityReference.Create('semapv:ManualMappingCuration'));
-mapping.DerivedFrom = [EntityReference.Create('mapping:source')];
-const metadata = new MappingSet(UriReference.Create('https://example.org/mappings'), UriReference.Create('https://example.org/license'));
-const document = new SssomDocument(metadata, [mapping]);
-if (document.Mappings.length !== 1 || document.Mappings[0].DerivedFrom.length !== 1) throw new Error('JavaScript model smoke failed');
+const document = SssomDocument.Create('https://example.org/mappings', 'https://example.org/license');
+document.Metadata.EnsurePrefix('uuid', 'urn:uuid:');
+const mapping = Mapping.CreateEntityMapping('skos:Concept', 'skos:exactMatch', 'skos:Collection', 'semapv:ManualMappingCuration');
+document.AddMappingWithRecordId('urn:uuid:smoke', mapping);
+const clone = document.Clone();
+clone.Mappings[0].Comment = 'clone only';
+if (document.Mappings.length !== 1 || document.Mappings[0].Comment !== undefined) throw new Error('JavaScript authoring clone smoke failed');
+if (document.TryFindMappingByRecordId('urn:uuid:smoke') === undefined) throw new Error('JavaScript record lookup smoke failed');
+const authored = SssomCodec.EncodeCanonical(document);
+if (!SssomCodec.DecodeEmbedded(authored).Mappings[0].RecordId) throw new Error('JavaScript authoring codec smoke failed');
 if (mappingDescriptors().length !== 51) throw new Error('JavaScript descriptors smoke failed');
 if (expandCurie([], 'skos:exactMatch') !== 'http://www.w3.org/2004/02/skos/core#exactMatch') throw new Error('JavaScript CURIE smoke failed');
 const source = '#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n';
@@ -467,11 +483,16 @@ let private smokePython pythonPackage =
         $"""import polyglot_sssom as sssom
 
 assert sssom.__version__ == '{packageVersion.Pep440}'
-mapping = sssom.Mapping(sssom.EntityReference.Create('skos:exactMatch'), sssom.EntityReference.Create('semapv:ManualMappingCuration'))
-mapping.DerivedFrom = [sssom.EntityReference.Create('mapping:source')]
-metadata = sssom.MappingSet(sssom.UriReference.Create('https://example.org/mappings'), sssom.UriReference.Create('https://example.org/license'))
-document = sssom.SssomDocument(metadata, [mapping])
-assert len(document.Mappings) == 1 and len(document.Mappings[0].DerivedFrom) == 1
+document = sssom.SssomDocument.Create('https://example.org/mappings', 'https://example.org/license')
+document.Metadata.EnsurePrefix('uuid', 'urn:uuid:')
+mapping = sssom.Mapping.CreateEntityMapping('skos:Concept', 'skos:exactMatch', 'skos:Collection', 'semapv:ManualMappingCuration')
+document.AddMappingWithRecordId('urn:uuid:smoke', mapping)
+clone = document.Clone()
+clone.Mappings[0].Comment = 'clone only'
+assert len(document.Mappings) == 1 and document.Mappings[0].Comment is None
+assert document.TryFindMappingByRecordId('urn:uuid:smoke') is not None
+authored = sssom.SssomCodec.EncodeCanonical(document)
+assert sssom.SssomCodec.DecodeEmbedded(authored).Mappings[0].RecordId is not None
 assert len(sssom.mapping_descriptors()) == 51
 assert sssom.expand_curie([], 'skos:exactMatch') == 'http://www.w3.org/2004/02/skos/core#exactMatch'
 source = '#mapping_set_id: https://example.org/mappings\n#license: https://example.org/license\nsubject_id\tpredicate_id\tobject_id\tmapping_justification\nskos:Concept\tskos:exactMatch\tskos:Collection\tsemapv:ManualMappingCuration\n'

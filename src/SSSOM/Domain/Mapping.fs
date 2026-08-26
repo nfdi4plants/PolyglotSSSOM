@@ -122,6 +122,36 @@ type Mapping(
     let mutable comment = comment
     let mutable extensionValues = ModelValue.arrayOrEmpty extensionValues
 
+    let multivalueNeedsV1_1 (values: string array) =
+        values |> Array.exists (fun value -> value.Contains("|"))
+
+    let entityValuesNeedV1_1 (values: EntityReference array) =
+        values |> Array.map (fun value -> value.Value) |> multivalueNeedsV1_1
+
+    let uriValuesNeedV1_1 (values: UriReference array) =
+        values |> Array.map (fun value -> value.Value) |> multivalueNeedsV1_1
+
+    static member private EntityReference(value: string) = EntityReference.Create value
+
+    /// Creates an entity-to-entity mapping from lexical URI or CURIE values.
+    static member CreateEntityMapping(subjectId: string, predicateId: string, objectId: string, mappingJustification: string) =
+        Mapping(
+            Mapping.EntityReference predicateId,
+            Mapping.EntityReference mappingJustification,
+            subjectId = Mapping.EntityReference subjectId,
+            objectId = Mapping.EntityReference objectId
+        )
+
+    /// Creates a mapping asserting that no target term was found for the subject.
+    static member CreateNoTermFoundMapping(subjectId: string, predicateId: string, mappingJustification: string) =
+        Mapping(
+            Mapping.EntityReference predicateId,
+            Mapping.EntityReference mappingJustification,
+            subjectId = Mapping.EntityReference subjectId,
+            objectId = Mapping.EntityReference "sssom:NoTermFound",
+            mappingCardinality = MappingCardinality.OneToNone
+        )
+
     /// Gets or sets the required mapping predicate.
     member _.PredicateId
         with get () = predicateId
@@ -288,3 +318,86 @@ type Mapping(
     member _.ExtensionValues
         with get () = extensionValues
         and set value = extensionValues <- ModelValue.nonNullArray value
+
+    /// Creates an independent copy of this mapping and all of its mutable collections and extension values.
+    member _.Clone() =
+        Mapping(
+            predicateId,
+            mappingJustification,
+            ?recordId = recordId,
+            ?subjectId = subjectId,
+            ?subjectLabel = subjectLabel,
+            ?subjectCategory = subjectCategory,
+            ?predicateLabel = predicateLabel,
+            ?predicateModifier = predicateModifier,
+            ?objectId = objectId,
+            ?objectLabel = objectLabel,
+            ?objectCategory = objectCategory,
+            authorId = Array.copy authorId,
+            authorLabel = Array.copy authorLabel,
+            reviewerId = Array.copy reviewerId,
+            reviewerLabel = Array.copy reviewerLabel,
+            creatorId = Array.copy creatorId,
+            creatorLabel = Array.copy creatorLabel,
+            ?license = license,
+            ?subjectType = subjectType,
+            ?subjectSource = subjectSource,
+            ?subjectSourceVersion = subjectSourceVersion,
+            ?objectType = objectType,
+            ?objectSource = objectSource,
+            ?objectSourceVersion = objectSourceVersion,
+            ?predicateType = predicateType,
+            ?mappingProvider = mappingProvider,
+            ?mappingSource = mappingSource,
+            ?mappingCardinality = mappingCardinality,
+            cardinalityScope = Array.copy cardinalityScope,
+            ?mappingTool = mappingTool,
+            ?mappingToolId = mappingToolId,
+            ?mappingToolVersion = mappingToolVersion,
+            ?mappingDate = mappingDate,
+            ?publicationDate = publicationDate,
+            ?reviewDate = reviewDate,
+            ?confidence = confidence,
+            ?reviewerAgreement = reviewerAgreement,
+            curationRule = Array.copy curationRule,
+            curationRuleText = Array.copy curationRuleText,
+            subjectMatchField = Array.copy subjectMatchField,
+            objectMatchField = Array.copy objectMatchField,
+            matchString = Array.copy matchString,
+            subjectPreprocessing = Array.copy subjectPreprocessing,
+            objectPreprocessing = Array.copy objectPreprocessing,
+            ?similarityScore = similarityScore,
+            ?similarityMeasure = similarityMeasure,
+            seeAlso = Array.copy seeAlso,
+            ?issueTrackerItem = issueTrackerItem,
+            derivedFrom = Array.copy derivedFrom,
+            ?other = other,
+            ?comment = comment,
+            extensionValues = (extensionValues |> Array.map (fun value -> ExtensionValue(value.SlotName, value.Value)))
+        )
+
+    member internal _.RequiresV1_1 =
+        recordId.IsSome
+        || predicateType.IsSome
+        || cardinalityScope.Length > 0
+        || mappingToolId.IsSome
+        || reviewDate.IsSome
+        || reviewerAgreement.IsSome
+        || derivedFrom.Length > 0
+        || subjectType = Some EntityType.ComposedEntityExpression
+        || objectType = Some EntityType.ComposedEntityExpression
+        || mappingCardinality = Some MappingCardinality.NoneToNone
+        || entityValuesNeedV1_1 authorId
+        || multivalueNeedsV1_1 authorLabel
+        || entityValuesNeedV1_1 reviewerId
+        || multivalueNeedsV1_1 reviewerLabel
+        || entityValuesNeedV1_1 creatorId
+        || multivalueNeedsV1_1 creatorLabel
+        || entityValuesNeedV1_1 curationRule
+        || multivalueNeedsV1_1 curationRuleText
+        || entityValuesNeedV1_1 subjectMatchField
+        || entityValuesNeedV1_1 objectMatchField
+        || multivalueNeedsV1_1 matchString
+        || entityValuesNeedV1_1 subjectPreprocessing
+        || entityValuesNeedV1_1 objectPreprocessing
+        || uriValuesNeedV1_1 seeAlso
