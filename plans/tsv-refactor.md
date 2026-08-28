@@ -1,13 +1,13 @@
 # PolyglotSSSOM TSV v1.0/1.1 Refactor Plan
 
-> **Status: Specification bundle, build/package foundation, portable domain model, TSV/YAML codec, and IR-ready authoring ergonomics implemented and package-smoke tested.**
+> **Status: Specification bundle, build/package foundation, portable domain model, TSV/YAML codec, and IR-ready authoring ergonomics implemented and package-smoke tested. The stable `0.1.0` NuGet package was prepared locally after 38 passing .NET tests and package-metadata inspection; it remains unpublished, and npm/Python packaging is outside this pass.**
 >
 > Captured on 2026-08-24. The project owner authorized the build-and-package
 > foundation, specification bundle, and subsequent portable-domain-model work
 > on 2026-08-25, then authorized the TSV/YAML codec implementation on
 > 2026-08-26, followed by the authoring-ergonomics phase on the same date.
-> Package publication and downstream BioFSharp work remain outside that
-> authorization.
+> The earlier NuGet preview `0.1.0-alpha.1` was published separately. Stable
+> package publication and downstream BioFSharp work remain separate operations.
 
 ## Summary
 
@@ -39,8 +39,8 @@
 - Pin the build SDK to the .NET 10.0.300 feature band with latest-patch roll-forward. The shipped library still targets `netstandard2.0`; tests target `net8.0`.
 - Use the public stable YAMLicious `1.0.0`, Fable.Core `5.2.0`, Fable.Python `5.4.0`, Fable.Pyxpecto `2.0.0`, Fable.Package.SDK `1.4.0`, and Python `fable-library` `5.13.0`.
 - Target `netstandard2.0`; add synchronized JavaScript and Python input projects and a FAKE build modeled after DataHubClient.
-- Produce `PolyglotSSSOM`, `@nfdi4plants/polyglot-sssom`, and `polyglot-sssom`. Keep package versions prerelease until SSSOM 1.1 is final.
-- Start all three packages at logical version `0.1.0-alpha.1` (`0.1.0a1` on Python), with `RELEASE_NOTES.md` as the single version source.
+- Produce `PolyglotSSSOM`, `@nfdi4plants/polyglot-sssom`, and `polyglot-sssom`. The stable NuGet package starts at `0.1.0`; support for SSSOM 1.1 remains explicitly tied to the pinned draft until a deliberate final-specification delta audit.
+- Keep `RELEASE_NOTES.md` as the package-version source. npm and Python packaging/versioning are not part of the stable NuGet packaging pass.
 - Require Node 22+ and Python 3.12+. Native npm/Python package roots expose only their version during Phase 1; the curated model/codec exports belong to later phases.
 - Add a thin, read-only CI job that invokes the FAKE package-smoke target and uploads artifacts. It must not publish them.
 - Remove checked-in generated Fable output and ignore generated JavaScript/Python directories.
@@ -111,6 +111,6 @@ mutable properties remain available.
 ## Assumptions
 
 - No backward compatibility with the current POC API or generated files is required.
-- No package is published as part of the refactor without separate authorization.
+- The stable NuGet package is packed locally but is not published without separate authorization.
 - SSSOM hashing, RDF, ontology integration, BioFSharp/ArcIR integration, and end-to-end DataHUB validation remain separate future work.
 - When SSSOM 1.1 becomes final, perform a deliberate schema/specification delta audit before replacing the pinned draft.
