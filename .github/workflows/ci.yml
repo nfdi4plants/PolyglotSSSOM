@@ -11,35 +11,123 @@ permissions:
   contents: read
 
 env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
-  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_NOLOGO: "true"
 
 jobs:
   verify:
     name: Test and package smoke
     runs-on: ubuntu-latest
-
+    timeout-minutes: 45
+    outputs:
+      release: ${{ steps.release.outputs.release }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          # The build uses .NET 10; tests and package consumers target .NET 8.
+          dotnet-version: |
+            8.0.x
+            10.0.3xx
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.12.5"
+      - name: Check release metadata
+        run: dotnet fsi --exec tests/ReleaseMetadata.Tests.fsx
+      - name: Check release eligibility
+        id: release
+        run: dotnet fsi --exec build/PrepareRelease.fsx "$RUNNER_TEMP/release-notes.md"
+      # Runs all runtime tests, packs once, and tests isolated consumers.
+      - name: Run the complete package acceptance path
+        run: bash build.sh TestPackages
+      - name: Upload tested packages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.release.outputs.release == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: artifacts/packages/*
+          if-no-files-found: error
+
+  publish:
+    name: GitHub release and trusted publishing
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.verify.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+          path: packages
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.3xx
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - uses: astral-sh/setup-uv@v9
-        with:
-          version: "0.12.5"
-      - name: Run the complete package acceptance path
+          node-version: 24
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11
+      - name: Read latest release notes from the tested commit
+        id: release
+        run: dotnet fsi --exec build/PrepareRelease.fsx "$RUNNER_TEMP/release-notes.md"
+      - name: Create release and tag, or skip an existing tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          PRERELEASE: ${{ steps.release.outputs.prerelease }}
+          RELEASE_NOTES: ${{ runner.temp }}/release-notes.md
         run: |
-          chmod +x build.sh
-          ./build.sh TestPackages
-      - name: Upload unpublished package artifacts
-        uses: actions/upload-artifact@v7
+          tags=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/$RELEASE_TAG" --jq '.[].ref')
+          if grep -Fxq "refs/tags/$RELEASE_TAG" <<< "$tags"; then
+            echo "Tag $RELEASE_TAG already exists; skipping GitHub release creation."
+          else
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" --title "$RELEASE_TAG" \
+              --notes-file "$RELEASE_NOTES" --prerelease="$PRERELEASE"
+          fi
+      # An existing tag skips only GitHub release creation. Registry publishing
+      # still runs, and already-published package versions fail normally.
+      - name: Exchange OIDC token for a temporary NuGet API key
+        uses: NuGet/login@v1
+        id: nuget-login
         with:
-          name: polyglot-sssom-packages
-          path: artifacts/packages/*
-          if-no-files-found: error
+          user: ${{ secrets.NUGET_USER }}
+      - name: Publish NuGet package
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          RELEASE_VERSION: ${{ steps.release.outputs.semver }}
+        run: >-
+          dotnet nuget push "./packages/PolyglotSSSOM.${RELEASE_VERSION}.nupkg"
+          --api-key "$NUGET_API_KEY"
+          --source https://api.nuget.org/v3/index.json
+      - name: Publish npm package with OIDC
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.semver }}
+          NPM_DIST_TAG: ${{ steps.release.outputs.npm_tag }}
+        run: >-
+          npm publish "./packages/nfdi4plants-polyglot-sssom-${RELEASE_VERSION}.tgz"
+          --access public --ignore-scripts --tag "$NPM_DIST_TAG"
+      - name: Stage Python wheels
+        run: |
+          mkdir pypi-dist
+          cp packages/*.whl pypi-dist/
+      - name: Publish Python wheel with OIDC
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pypi-dist/
